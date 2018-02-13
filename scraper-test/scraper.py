@@ -1,6 +1,7 @@
 import scrapy
 from pathlib import Path
-
+import os
+import errno
 
 class CancerSpider(scrapy.Spider):
     filenum = 0
@@ -10,6 +11,11 @@ class CancerSpider(scrapy.Spider):
     }
     name="cancer_spider"
     start_urls=['https://keskustelu.suomi24.fi/haku?keyword=sy%C3%B6p%C3%A4']
+    try:
+        os.makedirs('scrapes')
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
     filePath = Path('./scrapes/')
 
     def parse(self, response):
@@ -30,23 +36,23 @@ class CancerSpider(scrapy.Spider):
         filename=subword+filenum+'.txt'
         f = open(filepath/filename,'w')
         datastore={}
-        datastore['title']=response.css('h1.thread-header ::text').extract_first()
-        datastore['timestamp']=response.css('div.user-info-big.p.user-info-timestamp ::text').extract_first()
-        datastore['user']=response.css('div.user-info-big.p.user-info-name ::text').extract_first()
-        datastore['thread-body']=response.css('div.thread-text ::text').extract_first()
+        datastore['title']=response.css('h1.thread-header ::text').extract_first().strip()
+        datastore['timestamp']=response.css('div.user-info-big.p.user-info-timestamp ::text').extract_first().strip()
+        datastore['user']=response.css('div.user-info-big.p.user-info-name ::text').extract_first().strip()
+        datastore['thread-body']=response.css('div.thread-text ::text').extract_first().strip()
         datastore['answers']={}
         for answer in response.css('div.answer-container'):
             answer={}
-            answer['answer-body']=answer.css('div.answer-text ::text').extract_first()
-            answer['timestamp']=answer.css('p.user-info-timestamp ::text').extract_first()
-            answer['user']=answer.css('p.user-info-name ::text').extract_first()
+            answer['answer-body']=answer.css('div.answer-text ::text').extract_first().strip()
+            answer['timestamp']=answer.css('p.user-info-timestamp ::text').extract_first().strip()
+            answer['user']=answer.css('p.user-info-name ::text').extract_first().strip()
             answer['comments']={}
             if response.css('div.comments-list'):
                 for comment in response.css('div.comment'):
                     comment={}
-                    comment['comment-body']=comment.css('div.comment-text ::text').extract_first()
-                    comment['timestamp']=comment.css('p.user-info-timestamp ::text').extract_first()
-                    comment['user']=comment.css('p.user-info-name ::text').extract_first()
+                    comment['comment-body']=comment.css('div.comment-text ::text').extract_first().strip()
+                    comment['timestamp']=comment.css('p.user-info-timestamp ::text').extract_first().strip()
+                    comment['user']=comment.css('p.user-info-name ::text').extract_first().strip()
                     answer['comments'].append(comment)
             datastore['answers'].append(answer)
         f.write(datastore)

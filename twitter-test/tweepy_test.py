@@ -30,26 +30,6 @@ api = tweepy.API(auth, wait_on_rate_limit=True,
 
 user = api.get_user('twitter')
 
-# results = api.search(q="syöpä", count=50)
-# for result in results:
-#     print("Tweet:")
-#     print(result.text)
-#     print(translator.translate(result.text))
-# count=0
-
-# for tweet in tweepy.Cursor(api.search,
-#                            q="syöpä",
-#                            count=200,
-#                            result_type="recent",
-#                            tweet_mode="extended",
-#                            include_rts=False).items():
-#     count=count+1
-#     print("Tweet:")
-#     print (tweet.created_at, tweet.full_text)
-#     # print(translator.translate(tweet.full_text))
-# print(count)
-
-
 tweetCount = 0
 print("Downloading max {0} tweets".format(maxTweets))
 with open(fName, 'w') as f:

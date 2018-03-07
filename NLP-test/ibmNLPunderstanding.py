@@ -26,7 +26,7 @@ class AlchemyNLPunderstanding(object):
     print(json.dumps(response, indent=2))
 
 
-NLP_understanding = AlchemyNLPunderstanding()
-NLP_understanding.get_response('I tried to set up an appointment using the part of the website that I will display here,'
-                                     ' and they did not get beck to me, in fact the owner told me that he reported it as spam.'
-                                     ' I believe this is because of my race and gend')
+# NLP_understanding = AlchemyNLPunderstanding()
+# NLP_understanding.get_response('I tried to set up an appointment using the part of the website that I will display here,'
+#                                      ' and they did not get beck to me, in fact the owner told me that he reported it as spam.'
+#                                      ' I believe this is because of my race and gend')

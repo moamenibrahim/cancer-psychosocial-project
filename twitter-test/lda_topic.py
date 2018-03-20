@@ -25,27 +25,17 @@ class lda_modeling(object):
 		stop = set(stopwords.words('english'))
 		exclude = set(string.punctuation)
 		lemma = WordNetLemmatizer()
-		
 		norm = []
-		for doc in doc_complete:
-			stop_free = " ".join([i for i in doc.lower().split() if i not in stop])
-			punc_free = ''.join(ch for ch in stop_free if ch not in exclude)
-			normalized = " ".join(lemma.lemmatize(word) for word in punc_free.split())
-			norm.append(normalized.split())
+		stop_free = [i for i in doc_complete.lower().split() if i not in stop]
+		punc_free = ' '.join(ch for ch in stop_free if ch not in exclude)
+		normalized = " ".join(lemma.lemmatize(word) for word in punc_free.split())
+		norm.append(normalized.split())
 		return norm
 
-	def generate_topic(self):
-
-		doc_complete = []
-		with open ("input.txt", "r") as tpfile:
-			for line in tpfile:
-				term = line
-				doc_complete.append(term)
-
-		texts = self.preprocess_sentences(doc_complete)
+	def generate_topic(self, input):
+		texts = self.preprocess_sentences(input)
 		dictionary = corpora.Dictionary(texts)
 		doc_term_matrix = [dictionary.doc2bow(text) for text in texts]
-
 		Lda = gensim.models.ldamodel.LdaModel
 		ldamodel = Lda(doc_term_matrix, num_topics=3, id2word = dictionary, passes=300)
 		str = ldamodel.print_topics(num_topics=3, num_words=3)
@@ -54,8 +44,4 @@ class lda_modeling(object):
 		result = re.findall('[a-zA-Z]+',t)
 		print('topics from user input', result)
 
-		file = open("lda_topict.txt", "w")
-		for i in range(0, len(result)):
-			file.write(result[i]+"\n") 
-		file.close()
 		return result

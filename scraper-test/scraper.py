@@ -6,9 +6,22 @@ import errno
 class CancerSpider(scrapy.Spider):
     filenum = 0
     allowed_subwords=["Terveys","Paikkakunnat"]
+
     custom_settings={
         'DOWNLOAD_DELAY':'0.75'
     }
+    """
+    RETRY_TIMES = 10
+    RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
+
+    DOWNLOADER_MIDDLEWARES = {
+        'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+        'scrapy_proxies.RandomProxy': 100,
+        'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    }
+
+    PROXY_LIST = '/home/feilz/workspace/cancerproject/bin/list.txt'
+    """
     name="cancer_spider"
     start_urls=['https://keskustelu.suomi24.fi/haku?keyword=sy%C3%B6p%C3%A4']
     try:

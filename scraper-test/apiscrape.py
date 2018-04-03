@@ -14,16 +14,19 @@ wordcount = {}
 data = {"threads" : 0,
         "comments" : 0,
         "wordpairs" : 0}
+
+#check if one of the keywords exist in the given string
 def search_keywords(string, keywords):
     for word in keywords:
         if word in string.lower():
             return True
         return False
+#helper function to add word into the dictionary
 def addword(word):
     if word not in wordcount:
         wordcount[word] = 0
     wordcount[word] += 1
-
+#writing out to log-file the current contents of wordcount
 def writeToFile():
     try:
         remove("logs.txt")
@@ -37,6 +40,7 @@ def writeToFile():
             f.write("%s,%s,%i\n" %(sorted_wc[i][0][0],sorted_wc[i][0][1],sorted_wc[i][1]))
         f.close()
 
+#Load keywords and stopwords, and define characters to be removed
 toberemoved = ["<p>","</p>",",",".","?","!"]
 
 keyword_file = open("./finnish_keywords.txt","r")
@@ -44,39 +48,33 @@ sents = keyword_file.read().split(",")
 keywords = sents[0].split("\n")
 keyword_file.close()
 
-#f = json.load(open(sys.argv[1]))
+
 righttopics = ["Paikkakunnat","Terveys"]
 stopwords_file = open("./finnish_stopwords.txt","r")
 lines = stopwords_file.read().split(",")
 stopwords = lines[0].split("\n")
 stopwords_file.close()
-#pprint(stopwords)
+#location of json folder to read data from
 files = listdir("./textdumps")
 punc = set(string.punctuation)
 
-i=0
-
-
+#simple checking if the string contains wrong messages
 def checkBody(string):
     returned=" "
     if "http" in string:
-        #print("http found")
         return returned
     for w in toberemoved:
         if w in string:
-            #print(string)
             returned = string.replace(w,"")
             return checkBody(returned)
     return string
-
+#Check if the thread is in the correct topics
 def checkTopic(topics,righttopics):
     for topic in topics:
-        #print(topic["title"])
         if topic["title"] in righttopics:
-            #print(topic["title"])
             return False
     return True
-
+#Handling final checks of the sentences before actual words are added
 def addSentence(w):
     cnt = len(w)
     for i in range(0,cnt):
@@ -93,19 +91,15 @@ for fileN in files:
     else:
         continue
 
-    #filename="./textdumps/dump10100-10199.json"
     with open(filename) as f:
         print(filename)
         try:
             items = ijson.items(f,"item")
             for o in items:
-                #i+=1
-                #print("analyzing object %i" %(i))
                 body = o["body"]
                 body = checkBody(body)
-                #print(body)
+
                 if checkTopic(o["topics"],righttopics):
-                    #print("notRight")
                     continue
                 if (search_keywords(body,keywords)==True) and body != removed:
                     data["threads"]+=1
@@ -117,9 +111,7 @@ for fileN in files:
                     sent = c["body"]
                     if (search_keywords(body,keywords)==True) and body != removed:
                         data["comments"]+=1
-                        #print(body)
                         cleanC = [word for word in body.split() if word.lower() not in stopwords]
-                        #print(cleanC)
                         addSentence(cleanC)
 
         except ValueError:

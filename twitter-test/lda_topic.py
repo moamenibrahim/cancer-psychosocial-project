@@ -15,11 +15,31 @@ import sys
 import itertools
 from itertools import product
 from nltk.tokenize import word_tokenize
+import pickle
+import gensim
+from sklearn.feature_extraction.text import CountVectorizer
 
 class lda_modeling(object):
 	
 	def __init__(self):
 		pass
+
+	def train_lda(parameter_list):
+
+		with open('newsgroups', 'rb') as f:
+			newsgroup_data = pickle.load(f)
+
+		vect = CountVectorizer(min_df=20, max_df=0.2, stop_words='english',
+			token_pattern='(?u)\\b\\w\\w\\w+\\b')
+		
+		X = vect.fit_transform(newsgroup_data)
+		corpus = gensim.matutils.Sparse2Corpus(X, documents_columns=False)
+		id_map = dict((v, k) for k, v in vect.vocabulary_.items())
+		ldamodel = gensim.models.ldamodel.LdaModel(
+			corpus, num_topics=10, id2word=id_map, passes=25, random_state=34)
+		output = ldamodel.print_topics(10)
+		print output
+
 
 	def preprocess_sentences(self, doc_complete):
 		stop = set(stopwords.words('english'))

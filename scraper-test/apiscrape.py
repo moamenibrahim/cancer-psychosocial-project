@@ -6,6 +6,9 @@ import ijson
 import operator
 from pprint import pprint
 import string
+import nltk
+
+import re
 
 removed = "This message has been removed by ."
 
@@ -21,27 +24,31 @@ def search_keywords(string, keywords):
         if word in string.lower():
             return True
         return False
+
 #helper function to add word into the dictionary
 def addword(word):
     if word not in wordcount:
         wordcount[word] = 0
     wordcount[word] += 1
+
 #writing out to log-file the current contents of wordcount
 def writeToFile():
     try:
         remove("logs.txt")
     except OSError:
         pass
+    #print(wordcount)
     sorted_wc = sorted(wordcount.items(),key=operator.itemgetter(1),reverse=True)
     with open("logs.txt","a") as f:
         f.write("Threads: %s,Comments: %s\n" %(data["threads"],data["comments"]))
         f.write("Most common wordpairs in text: \n\n")
-        for i in range(0,150):
+        r= 250 if len(sorted_wc) > 250 else len(sorted_wc)
+        for i in range(0, r):
             f.write("%s,%s,%i\n" %(sorted_wc[i][0][0],sorted_wc[i][0][1],sorted_wc[i][1]))
         f.close()
 
 #Load keywords and stopwords, and define characters to be removed
-toberemoved = ["<p>","</p>",",",".","?","!"]
+toberemoved = ["<p>","</p>",",","?","!","-"]
 
 keyword_file = open("./finnish_keywords.txt","r")
 sents = keyword_file.read().split(",")
@@ -59,15 +66,7 @@ files = listdir("./textdumps")
 punc = set(string.punctuation)
 
 #simple checking if the string contains wrong messages
-def checkBody(string):
-    returned=" "
-    if "http" in string:
-        return returned
-    for w in toberemoved:
-        if w in string:
-            returned = string.replace(w,"")
-            return checkBody(returned)
-    return string
+
 #Check if the thread is in the correct topics
 def checkTopic(topics,righttopics):
     for topic in topics:
@@ -76,13 +75,48 @@ def checkTopic(topics,righttopics):
     return True
 #Handling final checks of the sentences before actual words are added
 def addSentence(w):
+    #print(w)
+    wordlist=[word for word in w.split()]
+    for i in range(len(wordlist)):
+        for j in range(i+1,len(wordlist)):
+            #print("test1")
+            #print(wordlist[i],wordlist[j])
+            if len(wordlist[i]) > 2 and len(wordlist[j]) > 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
+                #print("test2")
+                addword((wordlist[i],wordlist[j]))
+
+
+    """
     cnt = len(w)
     for i in range(0,cnt):
         for j in range(i+1,cnt):
-            if w[i]!=w[j] and w[i] not in punc and w[i] != " " and w[j] not in punc and w[j] != " ":
+            if w[i]!=w[j] and w[i] != " " and w[j] != " ":
                 if len(w[j])>3 and len(w[i])>3:
                     addword((w[i],w[j]))
+    """
+#Helper function to remove odd characters from single words
+def checkWord(wrd):
+    return re.sub(r'[^\w0-9]','',wrd)
 
+def checkSentence(string):
+    sents = nltk.sent_tokenize(string)
+    ret = []
+    for s in sents:
+        tmp = ""
+        if "http" in s:
+            #print("http")
+            continue
+        tokens = nltk.word_tokenize(s)
+        for w in tokens:
+            if w is removed:
+                continue
+            w=checkWord(w)
+            if w.lower() in stopwords:
+                #print(w)
+                continue
+            tmp+=w+" "
+        ret.append(tmp)
+    return ret
 
 
 for fileN in files:
@@ -90,29 +124,30 @@ for fileN in files:
         filename="./textdumps/{}".format(fileN)
     else:
         continue
-
     with open(filename) as f:
         print(filename)
         try:
             items = ijson.items(f,"item")
             for o in items:
-                body = o["body"]
-                body = checkBody(body)
-
                 if checkTopic(o["topics"],righttopics):
                     continue
-                if (search_keywords(body,keywords)==True) and body != removed:
-                    data["threads"]+=1
-                    clean = [word for word in body.split() if word.lower() not in stopwords]
-                    addSentence(clean)
-                else:
-                    continue
+                body = o["body"]
+                body = checkSentence(body)
+                for sentence in body:
+                    if (search_keywords(sentence,keywords)==True):
+                        data["threads"]+=1
+                        #clean = [word for word in sentence.split() if word.lower() not in stopwords]
+                        addSentence(sentence)
+                    else:
+                        continue
                 for c in o["comments"]:
                     sent = c["body"]
-                    if (search_keywords(body,keywords)==True) and body != removed:
-                        data["comments"]+=1
-                        cleanC = [word for word in body.split() if word.lower() not in stopwords]
-                        addSentence(cleanC)
+                    sent = checkSentence(sent)
+                    for s in sent:
+                        if (search_keywords(s,keywords)==True):
+                            data["comments"]+=1
+                            #cleanC = [word for word in body.split() if word.lower() not in stopwords]
+                            addSentence(s)
 
         except ValueError:
             print("ValueError")

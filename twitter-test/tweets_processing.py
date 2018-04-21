@@ -92,12 +92,6 @@ money_list =["money",
              "euros"]
 
 
-def funcname(parameter_list):
-    pass
-
-def funcname(parameter_list):
-    pass
-
 def databasePush(tweet_count, tweet_data):
     """ A method to send tweets without processed data 
     to the database on firebase """
@@ -122,7 +116,7 @@ def finnishParse(tweet, tweet_count):
     univerity of Turku, it performs sentence splitting, tokenization, tagging, parsing """
         
     wd = os.getcwd()
-    os.chdir("/home/moamen/work/cancer_material/Finnish-dep-parser")
+    os.chdir("/home/moamen/work/cancer/Finnish-dep-parser")
     with open('finnParse.txt', 'w+') as f:
             f.write(tweet)
     subprocess.call('cat finnParse.txt | ./parser_wrapper.sh > output.conllu', shell=True)
@@ -275,7 +269,6 @@ def analyze_file(fileName, tweet_count):
 if __name__ == "__main__":
 
     translator = Translator()
-    f = open("stream_results.txt", "w+")
 
     lda = lda_modeling()
     stop_words = set(stopwords.words('english'))

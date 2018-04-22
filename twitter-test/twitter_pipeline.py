@@ -5,6 +5,7 @@ import re
 import string
 import subprocess
 import nltk
+import operator
 from nltk.stem.wordnet import WordNetLemmatizer
 from gensim import corpora, models, similarities
 from nltk.corpus import stopwords
@@ -133,11 +134,21 @@ def get_translate(input_str, lang):
 def get_pos(tweet):
     """ 
     part of speech tagging extraction
-    TODO: nltk tagger
     """
     text = word_tokenize(str(tweet))
     result_postag = nltk.pos_tag(text)
     # printRoutine(result_postag)
+    for row in result_postag:
+        if (row[1] != ''):
+            if (row[1] in staged_rows):
+                ## increment
+                staged_rows[row[1]] += 1
+            else:
+                ## add to list
+                staged_rows[row[1]] = 1
+
+    printRoutine(sorted(staged_rows.items(),
+                        key=operator.itemgetter(1), reverse=True))
     return result_postag
 
 def get_stanford_pos(tweet):
@@ -265,8 +276,8 @@ def analyze_file(fileName, tweet_count):
             tweet_count = tweet_count + 1
             printRoutine('------------------------------------------------------')
             printRoutine(str(tweet_count))
-            printRoutine(tweet)
-            printRoutine(tweet_data['lang'])
+            # printRoutine(tweet)
+            # printRoutine(tweet_data['lang'])
             pure_text = strip_all_entities(strip_links(tweet))
             translated = get_translate(pure_text, tweet_data['lang'])
 
@@ -284,6 +295,9 @@ if __name__ == "__main__":
 
     translator = Translator()
     f = open("stream_results.txt", "w+")
+    staged_location = {}
+    staged_users = {}
+    staged_rows = {}
 
     tweet_count = 0
 

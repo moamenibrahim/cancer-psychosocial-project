@@ -196,7 +196,7 @@ def get_pos(tweet):
 def get_sentiment(input_str):
     """ Get sentiment analysis when needed, the used API is IBM watson's """
 
-    NLP_understanding.get_response(input_str)
+    return NLP_understanding.get_response(input_str)
 
 
 def extract_link(text):

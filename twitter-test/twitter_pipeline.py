@@ -83,7 +83,7 @@ def printRoutine(inputTxt):
     """ Method to print in a file and on screen for debugging purposes """
 
     # print(str(inputTxt))
-    f.write(str(inputTxt)+'\n')
+    # f.write(str(inputTxt)+'\n')
 
 
 def get_hashtags(tweet,tweet_count):
@@ -96,15 +96,15 @@ def get_link(tweet,tweet_count):
     # the study or no.
 
     regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
-    match = re.search(regex, text)
+    match = re.search(regex, tweet)
     if match:
         return match.group()
     return ''
 
-def strip_links(text):
-    link_regex = re.compile(
-        '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL)
+def strip_links(text,data):
+    link_regex = re.compile('((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL)
     links = re.findall(link_regex, text)
+    data.append({'links':links})
     for link in links:
         text = text.replace(link[0], ' ')
     return text
@@ -135,6 +135,7 @@ def get_pos(tweet):
     part of speech tagging extraction
     TODO: nltk tagger
     """
+    staged_rows={}
     text = word_tokenize(str(tweet))
     result_postag = nltk.pos_tag(text)
     # printRoutine(result_postag)
@@ -164,11 +165,13 @@ def get_hyponyms(tweet):
     hyponyms extraction and checking the topics list 
     TODO: wordnet vs wordvector
     """
+    entities={}
     words=tweet.split()
     for word in words:
         for i, j in enumerate(wn.synsets(word)):
-            printRoutine ("Meaning:"+str(i)+" NLTK ID:"+str(j.name()))
-            printRoutine("Hyponyms: "+str(j.hyponyms()))
+            entities["Meaning:"+str(i)+" NLTK ID:"+str(j.name())]
+            entities["Meaning:"+str(i)+" NLTK ID:"+str(j.name())].append("Hyponyms: "+str(j.hyponyms()))
+    return entities
 
 def get_named_entity(tweet):
     """ 
@@ -197,31 +200,28 @@ def visualize_results(input):
     """
     pass
 
-def get_topic(input_str):
-    """ Topic extraction from text using LDA (Latent Dirichet Allocation): 
-    It classifies the text according to whether it is family, friend, money related"""
-
-    try:
-        topic = lda.generate_topic(input_str)
-        if any(word in topic for word in family_list):
-            printRoutine("family related tweet: extracting emotions")
-            get_sentiment(input_str)
-
-        if any(word in topic for word in friend_list):
-            printRoutine("friend related tweet: extracting emotions")
-            get_sentiment(input_str)
-
-        if any(word in topic for word in money_list):
-            printRoutine("money related tweet")
-            get_sentiment(input_str)
-        return True
-    except:
-        printRoutine("Error getting topic")
-        return False
+# def get_topic(input_str):
+#     """ Topic extraction from text using LDA (Latent Dirichet Allocation): 
+#     It classifies the text according to whether it is family, friend, money related"""
+#     try:
+#         topic = lda.generate_topic(input_str)
+#         if any(word in topic for word in family_list):
+#             printRoutine("family related tweet: extracting emotions")
+#             get_sentiment(input_str)
+#         if any(word in topic for word in friend_list):
+#             printRoutine("friend related tweet: extracting emotions")
+#             get_sentiment(input_str)
+#         if any(word in topic for word in money_list):
+#             printRoutine("money related tweet")
+#             get_sentiment(input_str)
+#         return True
+#     except:
+#         printRoutine("Error getting topic")
+#         return False
 
 def analyze_location(fileName):
     """ Method to analyze file by file and calls all other methods """
-
+    staged_location={}
     for line in fileName.readlines():
 
         tweet_data = json.loads(line)
@@ -237,7 +237,7 @@ def analyze_location(fileName):
 
 def analyze_user(fileName):
     """ Method to analyze file by file and calls all other methods """
-
+    staged_users={}
     for line in fileName.readlines():
 
         tweet_data = json.loads(line)
@@ -263,19 +263,25 @@ def analyze_file(fileName, tweet_count):
 
         if any(word in tweet for word in mylist):
             tweet_count = tweet_count + 1
-            printRoutine('------------------------------------------------------')
+            # printRoutine('------------------------------------------------------')
             printRoutine(str(tweet_count))
-            printRoutine(tweet)
-            printRoutine(tweet_data['lang'])
+            # printRoutine(tweet)
+            data['tweet'+str(tweet_count)]
+            # printRoutine(tweet_data['lang'])
+            data['tweet'+str(tweet_count)].append({'lang':tweet_data['lang']})
             pure_text = strip_all_entities(strip_links(tweet))
             translated = get_translate(pure_text, tweet_data['lang'])
 
             if translated:
                 printRoutine(translated)
-                printRoutine(get_pos(translated))
+                data['tweet'+str(tweet_count)].append({'translation':translated})
+                pos=get_pos(translated)
+                data['tweet'+str(tweet_count)].append({'pos':pos})
                 printRoutine(get_stanford_pos(translated))
-                printRoutine(get_hyponyms(translated))
-                printRoutine(get_stanford_named_entity(translated))
+                hyponyms=get_hyponyms(translated)
+                data['tweet'+str(tweet_count)].append({'hyponyms':hyponyms})
+                named = get_stanford_named_entity(translated)
+                data['tweet'+str(tweet_count)].append({'named entity':named})
 
     return int(tweet_count)
 
@@ -283,7 +289,9 @@ def analyze_file(fileName, tweet_count):
 if __name__ == "__main__":
 
     translator = Translator()
-    f = open("stream_results.txt", "w+")
+    f = open("stream_results.json", "w+")
+
+    data={}
 
     tweet_count = 0
 

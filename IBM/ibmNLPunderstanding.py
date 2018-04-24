@@ -23,7 +23,7 @@ class AlchemyNLPunderstanding(object):
           emotion=True,
           sentiment=True,
           limit=2)))
-    print(json.dumps(response, indent=2))
+    return json.dumps(response, indent=2)
 
 
 # NLP_understanding = AlchemyNLPunderstanding()

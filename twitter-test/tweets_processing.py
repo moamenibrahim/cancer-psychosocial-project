@@ -33,7 +33,7 @@ config = {
     "projectId": "analysis-820dc",
     "storageBucket": "analysis-820dc.appspot.com",
     "messagingSenderId": "863565878024",
-    "serviceAccount": "/home/moamen/work/cancerDashboard/key.json"
+    "serviceAccount": "../../cancerDashboard/key.json"
 } 
 
 """ list for family related keywords and queries """
@@ -72,7 +72,7 @@ class functions(object):
         self.stop_words = set(stopwords.words('english'))
         self.NLP_understanding = AlchemyNLPunderstanding()
         self.tagger = geniatagger.GeniaTagger(
-            '/home/moamen/work/cancer/geniatagger-3.0.2/geniatagger')
+            '../../geniatagger-3.0.2/geniatagger')
         self.firebase = pyrebase.initialize_app(config)
         self.auth = self.firebase.auth()
         self.db = self.firebase.database()
@@ -116,17 +116,6 @@ class functions(object):
         return ' '.join(words)
 
 
-    def get_translate(self, input_str, lang):
-        """ using googletrans to translate text from any language to English """
-
-        if(lang != 'und'):
-            try:
-                translated = self.translator.translate(input_str, dest='en', src=lang)
-                return translated.text
-            except:
-                return False
-
-
     def get_pos(self, tweet):
         """ 
         part of speech tagging extraction
@@ -153,11 +142,8 @@ class functions(object):
         part of speech tagging extraction
         TODO: standford tagger
         """
-        home = expanduser("~")
-        path_to_model = home + \
-            '/work/cancer/stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
-        path_to_jar = home + \
-            '/work/cancer/stanford/stanford-postagger/stanford-postagger.jar'
+        path_to_model ='../../stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
+        path_to_jar ='../../stanford/stanford-postagger/stanford-postagger.jar'
         st = StanfordPOSTagger(path_to_model, path_to_jar=path_to_jar)
         result = st.tag(tweet.split())
         return result
@@ -191,8 +177,7 @@ class functions(object):
         get named entity recognition and check if words have entry in lexical database 
         TODO: Stanford named entity
         """
-        home = expanduser("~")
-        stanford_dir = home + '/work/cancer/stanford/stanford-nertagger/'
+        stanford_dir = '../../stanford/stanford-nertagger/'
         jarfile = stanford_dir + 'stanford-ner.jar'
         modelfile = stanford_dir + 'classifiers/english.all.3class.distsim.crf.ser.gz'
         st = StanfordNERTagger(model_filename=modelfile, path_to_jar=jarfile)

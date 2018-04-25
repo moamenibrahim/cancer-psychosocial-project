@@ -90,7 +90,7 @@ if __name__ == "__main__":
     processing = functions()
     f = open("stream_results.json", "w+")
     tweet_count = 0
-    for x in range(3,5):
+    for x in range(3,30):
         fread = open("outputDir/2018-03-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
     f.close()

@@ -79,12 +79,19 @@ class functions(object):
         time.sleep(7)
 
 
-    def get_hashtags(self, tweet, tweet_count):
-        # TODO
-        pass
+    def get_hashtags(self, tweet):
+        """ Extracting Hashtags from tweets or text """
+        entity_prefixes = '#'
+        words = []
+        for word in tweet.split():
+            word = word.strip()
+            if word:
+                if word[0] in entity_prefixes:
+                    words.append(word)
+        return ' '.join(words)
 
 
-    def get_link(self, tweet, tweet_count):
+    def get_link(self, tweet):
         """ Extracting links from tweets or text """
         # TODO : determine the link info and know whether it can be helpful for
         # the study or no.
@@ -262,8 +269,6 @@ class functions(object):
 
     def extract_link(self, text):
         """ Extracting links from tweets or text """
-        # TODO : determine the link info and know whether it can be helpful for
-        # the study or no. 
 
         regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
         match = re.search(regex, text)

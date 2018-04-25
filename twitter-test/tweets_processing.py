@@ -72,7 +72,7 @@ class functions(object):
         self.stop_words = set(stopwords.words('english'))
         self.NLP_understanding = AlchemyNLPunderstanding()
         self.tagger = geniatagger.GeniaTagger(
-            '../../geniatagger-3.0.2/geniatagger')
+            '../../cancer/geniatagger-3.0.2/geniatagger')
         self.firebase = pyrebase.initialize_app(config)
         self.auth = self.firebase.auth()
         self.db = self.firebase.database()
@@ -149,8 +149,8 @@ class functions(object):
         part of speech tagging extraction
         TODO: standford tagger
         """
-        path_to_model ='../../stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
-        path_to_jar ='../../stanford/stanford-postagger/stanford-postagger.jar'
+        path_to_model ='../../cancer/stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
+        path_to_jar ='../../cancer/stanford/stanford-postagger/stanford-postagger.jar'
         st = StanfordPOSTagger(path_to_model, path_to_jar=path_to_jar)
         result = st.tag(tweet.split())
         return result
@@ -184,7 +184,7 @@ class functions(object):
         get named entity recognition and check if words have entry in lexical database 
         TODO: Stanford named entity
         """
-        stanford_dir = '../../stanford/stanford-nertagger/'
+        stanford_dir = '../../cancer/stanford/stanford-nertagger/'
         jarfile = stanford_dir + 'stanford-ner.jar'
         modelfile = stanford_dir + 'classifiers/english.all.3class.distsim.crf.ser.gz'
         st = StanfordNERTagger(model_filename=modelfile, path_to_jar=jarfile)
@@ -293,7 +293,7 @@ class functions(object):
         univerity of Turku, it performs sentence splitting, tokenization, tagging, parsing """
             
         wd = os.getcwd()
-        os.chdir("/home/moamen/work/cancer/Finnish-dep-parser")
+        os.chdir("../../cancer/Finnish-dep-parser")
         with open('finnParse.txt', 'w+') as f:
                 f.write(tweet)
         subprocess.call('cat finnParse.txt | ./parser_wrapper.sh > output.conllu', shell=True)

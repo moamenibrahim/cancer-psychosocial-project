@@ -57,7 +57,8 @@ def analyze_file(fileName, tweet_count):
             # link_extracted = processing.extract_link(tweet)
             # guess_type_of(link_extracted)
             # databasePush(tweet_count, tweet_data)
-
+            
+            hastags = processing.get_hashtags(tweet)
             no_links_text, links = processing.strip_links(tweet)
             pure_text = processing.strip_all_entities(no_links_text)
             translated = processing.get_translate(pure_text, tweet_data['lang'])

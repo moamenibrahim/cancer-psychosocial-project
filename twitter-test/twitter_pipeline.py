@@ -65,16 +65,17 @@ def analyze_file(fileName, tweet_count):
 
             if translated:
                 pos = processing.get_pos(translated)
+                dict_result = processing.check_dictionary(translated)
                 hyponyms = processing.get_hyponyms(translated)
                 named = processing.get_stanford_named_entity(translated)
                 topic = processing.get_topic(translated)
                 sentiment = processing.get_sentiment(translated)
-                
+                                
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
                         'links': links, 'translation': translated, 'pos': pos,
                         'hyponyms': hyponyms, 'named entity': named,
-                        'topic': topic, 'sentiment': sentiment}
+                        'topic': topic, 'sentiment': sentiment, 'check_dictionary': dict_result}
                 
             else:
                 data = {'tweet': tweet_count,

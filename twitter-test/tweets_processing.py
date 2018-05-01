@@ -11,6 +11,7 @@ import mimetypes
 import subprocess
 import nltk 
 import time
+import enchant
 from nltk.stem.wordnet import WordNetLemmatizer
 from gensim import corpora, models, similarities
 from nltk.corpus import stopwords
@@ -76,6 +77,7 @@ class functions(object):
         self.firebase = pyrebase.initialize_app(config)
         self.auth = self.firebase.auth()
         self.db = self.firebase.database()
+        self.dictionary= enchant.Dict("en_US")
         time.sleep(7)
 
 
@@ -355,3 +357,15 @@ class functions(object):
                     ## add user to list
                     staged_users[user] = 1
         return
+
+    def check_dictionary(self, tweet):
+        in_dict=0
+        not_in_dict=0
+        text = word_tokenize(str(tweet))
+        for word in text:
+            result = self.dictionary.check(word)
+            if result == True:
+                in_dict +=1
+            else:
+                not_in_dict +=1 
+        return in_dict/(in_dict+not_in_dict)

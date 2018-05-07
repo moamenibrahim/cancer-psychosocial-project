@@ -73,7 +73,7 @@ aluksi
 alussa
 alusta
 annettavaksi
-annetteva
+annettava
 annettu
 ansiosta
 antaa

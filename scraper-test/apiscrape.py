@@ -26,10 +26,26 @@ def search_keywords(string, keywords):
         return False
 
 #helper function to add word into the dictionary
-def addword(word):
+def addword(word,dist):
     if word not in wordcount:
-        wordcount[word] = 0
-    wordcount[word] += 1
+        wordcount[word] = addDistance(dist)
+    else:
+        vals = addDistance(dist)
+        obj = wordcount[word]
+        for k in vals:
+            obj[k] += vals[k]
+
+def addDistance(dist):
+    a = {"1-2":0,"3-5":0,"6-8":0,"8+":0}
+    if dist<3:
+        a["1-2"]+=1
+    elif dist<6:
+        a["3-5"]+=1
+    elif dist<9:
+        a["6-8"]+=1
+    else:
+        a["8+"]+=1
+    return a
 
 #writing out to log-file the current contents of wordcount
 def writeToFile():
@@ -38,14 +54,25 @@ def writeToFile():
     except OSError:
         pass
     #print(wordcount)
-    sorted_wc = sorted(wordcount.items(),key=operator.itemgetter(1),reverse=True)
+    #sorted_wc = sorted(wordcount.items(),key=operator.itemgetter(1),reverse=True)
+    #pprint(wordcount)
+
     with open("logs.txt","a") as f:
         f.write("Threads: %s,Comments: %s\n" %(data["threads"],data["comments"]))
         f.write("Most common wordpairs in text: \n\n")
-        r= 250 if len(sorted_wc) > 250 else len(sorted_wc)
-        for i in range(0, r):
-            f.write("%s,%s,%i\n" %(sorted_wc[i][0][0],sorted_wc[i][0][1],sorted_wc[i][1]))
+        #r= 250 if len(sorted_wc) > 250 else len(sorted_wc)
+        #for i in range(0, r):
+        i = 0
+        for key,val in sorted(wordcount.items(), key= lambda i:sum(i[1].values()),reverse=True):
+            #print(key,val)
+            f.write("%s,%s,\n\t\t'total': %i,\n\t\t'1-2': %i, \n\t\t'3-5': %i, \n\t\t'6-8': %i,\n\t\t'8+': %i,\n\n" %
+            (key[0],key[1],int(sum(val.values())),int(val['1-2']),int(val['3-5']),int(val['6-8']),int(val['8+'])))
+            if (i>300):
+                break
+            i+=1
         f.close()
+
+#def
 
 #Load keywords and stopwords, and define characters to be removed
 toberemoved = ["<p>","</p>",",","?","!","-"]
@@ -83,7 +110,7 @@ def addSentence(w):
             #print(wordlist[i],wordlist[j])
             if len(wordlist[i]) > 2 and len(wordlist[j]) > 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
                 #print("test2")
-                addword((wordlist[i],wordlist[j]))
+                addword((wordlist[i],wordlist[j]),j-i)
 
 
     """

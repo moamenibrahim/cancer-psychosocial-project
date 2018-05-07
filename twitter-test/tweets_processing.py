@@ -2,22 +2,29 @@ import os
 import sys 
 import json
 import re
+import operator
 import geniatagger
 import string
-import time
 import pyrebase
 import urllib
 import mimetypes
 import subprocess
 import nltk 
+import time
+import enchant
 from nltk.stem.wordnet import WordNetLemmatizer
 from gensim import corpora, models, similarities
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from lda_topic import lda_modeling
-from ibmNLPunderstanding import AlchemyNLPunderstanding
 from googletrans import Translator
+from nltk.corpus import wordnet as wn
 from nltk.tokenize import RegexpTokenizer
+from os.path import expanduser
+from nltk.tag import StanfordNERTagger
+sys.path.insert(0, '../IBM')
+from ibmNLPunderstanding import AlchemyNLPunderstanding
+
 
 """ Configuration for the firbase database settings """ 
 config = { 
@@ -27,43 +34,8 @@ config = {
     "projectId": "analysis-820dc",
     "storageBucket": "analysis-820dc.appspot.com",
     "messagingSenderId": "863565878024",
-    "serviceAccount": "/home/moamen/work/cancerDashboard/key.json"
+    "serviceAccount": "../../cancerDashboard/key.json"
 } 
-
-""" A list contains the query words to search for """
-mylist = [  "cancer",
-            "tumor",
-            "leukemia",
-            "neuroblastoma",
-            "paraganglioma",
-            "retinoblastoma",
-            "astrocytomas",
-            "retinoblastoma",
-            "lymphoma",
-            "melanoma",
-            "syöpä",
-            "kasvain",
-            "säteily",
-            "hoito",
-            "kuolla",
-            "Malignant",  
-            # Refers to a tumor that is cancerous
-            "metastasis", 
-            # Cancer spreading
-            "oncology",   
-            # Study of cancer 
-            "oncologist",
-            "pathologist",
-            # Refers to cells that have the potential to become cancerous
-            "precancerous",
-            # A type of cancer
-            "Sarcoma",
-            "telemedicine",
-            "healthcare",
-            "chemotherapy",
-            "mammogram",
-            "Kræft",
-            "kreft"]
 
 """ list for family related keywords and queries """
 family_list = [ "family",
@@ -92,205 +64,308 @@ money_list =["money",
              "euros"]
 
 
-def funcname(parameter_list):
-    pass
 
-def funcname(parameter_list):
-    pass
-
-def databasePush(tweet_count, tweet_data):
-    """ A method to send tweets without processed data 
-    to the database on firebase """
-
-    db.child("Twitter").child("tweet"+str(tweet_count))
-    db.set(tweet_data)
-    pass
-
-def remove_stopWords(tweet):
-    """ Removing english stop words from the text sent 
-    including punctuations """
-
-    exclude = set(string.punctuation)
-    word_tokens = word_tokenize(tweet)
-    filtered_sentence = [w for w in word_tokens if not w in stop_words]
-    punc_free = ' '.join(ch for ch in filtered_sentence if ch not in exclude)
-    return filtered_sentence
-
-
-def finnishParse(tweet, tweet_count):
-    """ Parsing Finnish words and text, the library was developed by 
-    univerity of Turku, it performs sentence splitting, tokenization, tagging, parsing """
+class functions(object):
+    def __init__(self):
         
-    wd = os.getcwd()
-    os.chdir("/home/moamen/work/cancer_material/Finnish-dep-parser")
-    with open('finnParse.txt', 'w+') as f:
-            f.write(tweet)
-    subprocess.call('cat finnParse.txt | ./parser_wrapper.sh > output.conllu', shell=True)
-    subprocess.call('cat output.conllu | python split_clauses.py > output_clauses.conllu', shell=True)
-    subprocess.call(
-        'cat output_clauses.conllu | python visualize_clauses.py > output_clauses'+str(tweet_count)+'.html', shell=True)
-    with open('output.conllu','r') as f:
-        parse_result = f.readline()
-    os.chdir(wd)
-    return parse_result
+        self.translator = Translator()
+        self.lda = lda_modeling()
+        self.stop_words = set(stopwords.words('english'))
+        self.NLP_understanding = AlchemyNLPunderstanding()
+        self.tagger = geniatagger.GeniaTagger(
+            '../../cancer/geniatagger-3.0.2/geniatagger')
+        self.firebase = pyrebase.initialize_app(config)
+        self.auth = self.firebase.auth()
+        self.db = self.firebase.database()
+        self.dictionary= enchant.Dict("en_US")
+        time.sleep(7)
 
-def remove_finnstopWords(tweet):
-    """ Removing Finnish stop words from the text sent 
-    including links removal """
 
-    stopwords_file = open("./finnish_stopwords.txt", "r")
-    lines = stopwords_file.read().split(",")
-    stopwords = lines[0].split("\n")
-    tokenizer = RegexpTokenizer(r'\w+')
-    texts = []
-    raw = tweet.decode().lower()
-    tokens = tokenizer.tokenize(raw)
-    stopped_tokens = [i for i in tokens if not i in stopwords and len(i) != 1]
-    texts.append(stopped_tokens)
-    return stopped_tokens
+    def get_hashtags(self, tweet):
+        """ Extracting Hashtags from tweets or text """
+        entity_prefixes = '#'
+        words = []
+        for word in tweet.split():
+            word = word.strip()
+            if word:
+                if word[0] in entity_prefixes:
+                    words.append(word)
+        return ' '.join(words)
 
-def get_topic(input_str):
-    """ Topic extraction from text using LDA (Latent Dirichet Allocation): 
-    It classifies the text according to whether it is family, friend, money related"""
-    
-    try:
-        topic = lda.generate_topic(input_str)
-        if any(word in topic for word in family_list):
-            printRoutine("family related tweet: extracting emotions")
-            get_sentiment(input_str)
+
+    def get_link(self, tweet):
+        """ Extracting links from tweets or text """
+        # TODO : determine the link info and know whether it can be helpful for
+        # the study or no.
+
+        regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
+        match = re.search(regex, tweet)
+        if match:
+            return match.group()
+        return ''
+
+
+    def strip_links(self, text):
+        link_regex = re.compile(
+            '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL)
+        links = re.findall(link_regex, text)
+        for link in links:
+            text = text.replace(link[0], ' ')
+        return text, links
+
+
+    def strip_all_entities(self, text):
+        entity_prefixes = ['@', '#']
+        words = []
+        for word in text.split():
+            word = word.strip()
+            if word:
+                if word[0] not in entity_prefixes:
+                    words.append(word)
+        return ' '.join(words)
+
+
+    def get_pos(self, tweet):
+        """ 
+        part of speech tagging extraction
+        """
+        staged_rows = {}
+        text = word_tokenize(str(tweet))
+        result_postag = nltk.pos_tag(text)
+        for row in result_postag:
+            if (row[1] != ''):
+                if (row[1] in staged_rows):
+                    ## increment
+                    staged_rows[row[1]] += 1
+                else:
+                    ## add to list
+                    staged_rows[row[1]] = 1
+
+        staged_rows = sorted(staged_rows.items(),
+                            key=operator.itemgetter(1), reverse=True)
+        return staged_rows
+
+
+    def get_stanford_pos(self, tweet):
+        """
+        part of speech tagging extraction
+        TODO: standford tagger
+        """
+        path_to_model ='../../cancer/stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
+        path_to_jar ='../../cancer/stanford/stanford-postagger/stanford-postagger.jar'
+        st = StanfordPOSTagger(path_to_model, path_to_jar=path_to_jar)
+        result = st.tag(tweet.split())
+        return result
+
+
+    def get_hyponyms(self, tweet):
+        """ 
+        hyponyms extraction and checking the topics list 
+        TODO: wordnet vs wordvector
+        """
+        entities = {}
+        words = tweet.split()
+        for word in words:
+            for i, j in enumerate(wn.synsets(word)):
+                entities["Meaning:"+str(i)+" NLTK ID:"+str(j.name())] = []
+                entities["Meaning:"+str(i)+" NLTK ID:"+str(j.name())
+                        ].append("Hyponyms: "+str(j.hyponyms()))
+        return entities
+
+
+    def get_named_entity(self, tweet):
+        """ 
+        get named entity recognition and check if words have entry in lexical database 
+        TODO: Illinois named entity
+        """
+        pass
+
+
+    def get_stanford_named_entity(self, tweet):
+        """ 
+        get named entity recognition and check if words have entry in lexical database 
+        TODO: Stanford named entity
+        """
+        stanford_dir = '../../cancer/stanford/stanford-nertagger/'
+        jarfile = stanford_dir + 'stanford-ner.jar'
+        modelfile = stanford_dir + 'classifiers/english.all.3class.distsim.crf.ser.gz'
+        st = StanfordNERTagger(model_filename=modelfile, path_to_jar=jarfile)
+        result = st.tag(tweet.split())
+        return result
+
+
+    def remove_stopWords(self, tweet):
+        """ Removing english stop words from the text sent 
+        including punctuations """
+
+        exclude = set(string.punctuation)
+        word_tokens = word_tokenize(tweet)
+        filtered_sentence = [w for w in word_tokens if not w in self.stop_words]
+        punc_free = ' '.join(ch for ch in filtered_sentence if ch not in exclude)
+        return filtered_sentence
+
+
+    def get_topic(self, input_str):
+        """ Topic extraction from text using LDA (Latent Dirichet Allocation): 
+        It classifies the text according to whether it is family, friend, money related"""
         
-        if any(word in topic for word in friend_list):
-            printRoutine("friend related tweet: extracting emotions")
-            get_sentiment(input_str)
-
-        if any(word in topic for word in money_list):
-            printRoutine("money related tweet")
-            get_sentiment(input_str)
-        return True
-    except:
-        printRoutine("Error getting topic")
-        return False
-
-
-def get_translate(input_str,lang):
-    """ using googletrans to translate text from any language to English """
-
-    if(lang!='und'):
         try:
-            translated=translator.translate(input_str, dest='en', src=lang)
-            return translated.text
+            topic = self.lda.generate_topic(input_str)
+            if any(word in topic for word in family_list):
+                print("family related tweet: extracting emotions")
+                
+            
+            if any(word in topic for word in friend_list):
+                print("friend related tweet: extracting emotions")
+
+            if any(word in topic for word in money_list):
+                print("money related tweet")
+
+            return topic
+
         except:
-            printRoutine("Failed to translate text")
+            print("Error getting topic")
             return False
 
 
-def get_Geniapos(tweet):
-    """ Genia Tagger part of speech tagging extraction
-    Medical part of speech tagger """
+    def get_translate(self, input_str, lang):
+        """ using googletrans to translate text from any language to English """
 
-    out = tagger.parse(tweet)
-    printRoutine(out)
-
-
-def get_pos(tweet):
-    """ part of speech tagging extraction """
-
-    text = word_tokenize(str(tweet))
-    return nltk.pos_tag(text)
+        if(lang!='und'):
+            try:
+                translated=self.translator.translate(input_str, dest='en', src=lang)
+                return translated.text
+            except:
+                print("Failed to translate text")
+                return False
 
 
-def get_sentiment(input_str):
-    """ Get sentiment analysis when needed, the used API is IBM watson's """
+    def get_Geniapos(self, tweet):
+        """ Genia Tagger part of speech tagging extraction
+        Medical part of speech tagger """
 
-    NLP_understanding.get_response(input_str)
-
-
-def extract_link(text):
-    """ Extracting links from tweets or text """
-    # TODO : determine the link info and know whether it can be helpful for
-    # the study or no. 
-
-    regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
-    match = re.search(regex, text)
-    if match:
-        return match.group()
-    return ''
+        out = self.tagger.parse(tweet)
+        return out
 
 
-def guess_type_of(link, strict=True):
-    """ Determine the link info and know whether it can be helpful for
-    the study or no """
+    def get_sentiment(self, input_str):
+        """ Get sentiment analysis when needed, the used API is IBM watson's """
 
-    link_type, _ = mimetypes.guess_type(link)
-    print(link_type)
-
-    with urllib.request.urlopen(link) as response:
-        html = response.read()
-        if link_type is None and strict:
-            u = urllib.request.urlopen(link)
-            link_type = html.info().gettype()  
-            # or using: u.info().gettype()
-    return html
+        return self.NLP_understanding.get_response(input_str)
 
 
-def printRoutine(inputTxt):
-    """ Method to print in a file and on screen for debugging purposes """
+    def extract_link(self, text):
+        """ Extracting links from tweets or text """
 
-    print(str(inputTxt))
-    f.write(str(inputTxt)+'\n')
-
-
-def analyze_file(fileName, tweet_count):
-    """ Method to analyze file by file and calls all other methods """
-
-    for line in fileName.readlines():
-        tweet_data = json.loads(line)
-        if("extended_tweet") in tweet_data:
-            tweet = tweet_data['extended_tweet']['full_text']
-        else:
-            tweet = tweet_data['text']
-
-        if any(word in tweet for word in mylist):
-            tweet_count = tweet_count + 1
-            printRoutine('------------------------------------------------------')
-            printRoutine(str(tweet_count))
-            printRoutine(tweet)
-            printRoutine(tweet_data['lang'])
-            if tweet_data['lang']=='fi':
-                finnishParse(tweet, tweet_count)
-            result=remove_stopWords(tweet)
-            translated=get_translate(' '.join(result), tweet_data['lang'])
-            if translated:
-                printRoutine(translated)
-                get_topic(translated)
-                printRoutine(get_pos(translated))
-            link_extracted = extract_link(tweet)
-            printRoutine(link_extracted)
-            # guess_type_of(link_extracted)
-            # databasePush(tweet_count, tweet_data)
-            time.sleep(0.8)
-    return int(tweet_count)
+        regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
+        match = re.search(regex, text)
+        if match:
+            return match.group()
+        return ''
 
 
-if __name__ == "__main__":
+    def guess_type_of(self, link, strict=True):
+        """ Determine the link info and know whether it can be helpful for
+        the study or no """
 
-    translator = Translator()
-    f = open("stream_results.txt", "w+")
+        link_type, _ = mimetypes.guess_type(link)
+        print(link_type)
 
-    lda = lda_modeling()
-    stop_words = set(stopwords.words('english'))
-    NLP_understanding = AlchemyNLPunderstanding()
+        with urllib.request.urlopen(link) as response:
+            html = response.read()
+            if link_type is None and strict:
+                u = urllib.request.urlopen(link)
+                link_type = html.info().gettype()  
+                # or using: u.info().gettype()
+        return html
 
-    tweet_count = 0
-    tagger = geniatagger.GeniaTagger(
-        '/home/moamen/work/cancer_material/geniatagger-3.0.2/geniatagger')
-    firebase = pyrebase.initialize_app(config)
-    auth = firebase.auth()  
-    db= firebase.database()
 
-    time.sleep(7)
+    def databasePush(self, tweet_count, tweet_data):
+        """ A method to send tweets without processed data 
+        to the database on firebase """
 
-    for x in range(3,7):
-        fread = open("outputDir/2018-03-0"+str(x)+".json", "r")
-        tweet_count=analyze_file(fread,tweet_count)
-    f.close()
+        self.db.child("Twitter").child("tweet"+str(tweet_count))
+        self.db.set(tweet_data)
+        pass
+
+
+    ''' Finnish functions part '''
+    def finnishParse(self, tweet, tweet_count):
+        """ Parsing Finnish words and text, the library was developed by 
+        univerity of Turku, it performs sentence splitting, tokenization, tagging, parsing """
+            
+        wd = os.getcwd()
+        os.chdir("../../cancer/Finnish-dep-parser")
+        with open('finnParse.txt', 'w+') as f:
+                f.write(tweet)
+        subprocess.call('cat finnParse.txt | ./parser_wrapper.sh > output.conllu', shell=True)
+        subprocess.call('cat output.conllu | python split_clauses.py > output_clauses.conllu', shell=True)
+        subprocess.call(
+            'cat output_clauses.conllu | python visualize_clauses.py > output_clauses'+str(tweet_count)+'.html', shell=True)
+        with open('output.conllu','r') as f:
+            parse_result = f.readline()
+        os.chdir(wd)
+        return parse_result
+
+
+    def remove_finnstopWords(self, tweet):
+        """ Removing Finnish stop words from the text sent 
+        including links removal """
+
+        stopwords_file = open("./finnish_stopwords.txt", "r")
+        lines = stopwords_file.read().split(",")
+        stopwords = lines[0].split("\n")
+        tokenizer = RegexpTokenizer(r'\w+')
+        texts = []
+        raw = tweet.decode().lower()
+        tokens = tokenizer.tokenize(raw)
+        stopped_tokens = [i for i in tokens if not i in stopwords and len(i) != 1]
+        texts.append(stopped_tokens)
+        return stopped_tokens
+
+
+    ''' Fetching information about users (tweeps) '''
+    def analyze_location(self, fileName):
+        """ Method to analyze file by file and calls all other methods """
+        staged_location = {}
+        for line in fileName.readlines():
+
+            tweet_data = json.loads(line)
+            location = tweet_data['user']['location']
+            if (location != ''):
+                if (location in staged_location):
+                    ## increment that location
+                    staged_location[location] += 1
+                else:
+                    ## add location to list
+                    staged_location[location] = 1
+        return
+
+
+    def analyze_user(self, fileName):
+        """ Method to analyze file by file and calls all other methods """
+        staged_users = {}
+        for line in fileName.readlines():
+
+            tweet_data = json.loads(line)
+            user = tweet_data['user']['id']
+            if (user != ''):
+                if (user in staged_users):
+                    ## increment that user
+                    staged_users[user] += 1
+                else:
+                    ## add user to list
+                    staged_users[user] = 1
+        return
+
+    def check_dictionary(self, tweet):
+        in_dict=0
+        not_in_dict=0
+        text = word_tokenize(str(tweet))
+        for word in text:
+            result = self.dictionary.check(word)
+            if result == True:
+                in_dict +=1
+            else:
+                not_in_dict +=1 
+        return in_dict/(in_dict+not_in_dict)

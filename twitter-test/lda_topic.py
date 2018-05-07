@@ -38,7 +38,7 @@ class lda_modeling(object):
 		ldamodel = gensim.models.ldamodel.LdaModel(
 			corpus, num_topics=10, id2word=id_map, passes=25, random_state=34)
 		output = ldamodel.print_topics(10)
-		print output
+		print (output)
 
 
 	def preprocess_sentences(self, doc_complete):

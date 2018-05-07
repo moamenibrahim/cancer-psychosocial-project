@@ -8,7 +8,7 @@ from googletrans import Translator # for google translate
 
 translator = Translator()
 
-searchQuery = 'cancer'  # this is what we're searching for
+searchQuery = 'cancer patient'  # this is what we're searching for
 maxTweets = 10000000  # Some arbitrary large number
 tweetsPerQry = 100  # this is the max the API permits
 fName = 'tweets.json'  # We'll store the tweets in a text file.
@@ -31,7 +31,6 @@ auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True,
                  wait_on_rate_limit_notify=True)
 
-user = api.get_user('twitter')
 downloaded_tweets = 0
 tweetCount = 0
 
@@ -59,16 +58,17 @@ with open(fName, 'w') as f:
                 print("No more tweets found")
                 break
 
-            str=['Finland','Sweden','Suomi']
+            # str_lst=["Finland","Sweden","Suomi"]
             for tweet in new_tweets:
-                # if any(str in (tweet._json['user']['location'])):
-                if ('Finland' in (tweet._json['user']['location'])):
+                if tweet._json['user']['location'] != "":
+                # if  any(tweet._json['user']['location'] in s for s in str_lst) :
+                #if ('Finland' in (tweet._json['user']['location'])):
                     f.write(jsonpickle.encode(
                         tweet._json, unpicklable=False)+'\n')
                 
                     downloaded_tweets = downloaded_tweets+1
                     print(tweet._json['full_text'])
-                       
+                    
                     tweetCount += len(new_tweets)
                     print("searched {0} tweets".format(tweetCount))
                     max_id = new_tweets[-1].id

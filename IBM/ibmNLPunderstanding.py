@@ -12,18 +12,22 @@ class AlchemyNLPunderstanding(object):
         version='2017-02-27')
 
   def get_response(self,text):
-    response = self.natural_language_understanding.analyze(
-      text=text,
-      features=Features(
-        entities=EntitiesOptions(
-          emotion=True,
-          sentiment=True,
-          limit=2),
-        keywords=KeywordsOptions(
-          emotion=True,
-          sentiment=True,
-          limit=2)))
-    print(json.dumps(response, indent=2))
+    try:
+      response = self.natural_language_understanding.analyze(
+        text=text,
+        features=Features(
+          entities=EntitiesOptions(
+            emotion=True,
+            sentiment=True,
+            limit=2),
+          keywords=KeywordsOptions(
+            emotion=True,
+            sentiment=True,
+            limit=2)))
+      return json.dumps(response, indent=2)
+    except:
+      print("Error: unsupported text language for natural language understanding")
+
 
 
 # NLP_understanding = AlchemyNLPunderstanding()

@@ -51,7 +51,6 @@ for line in f.readlines():
     # Dictionary - sucess rate bar 
     try:
         dict_result = tweet_data['check_dictionary']*100
-        print(dict_result)
         rounded = round(dict_result)
         if (rounded in staged_dict):
             ## increment that rounded
@@ -108,30 +107,6 @@ for line in f.readlines():
         print("didn't translate this one - named entity")
 
 
-    # # Hyponyms - Scatter 
-    # hyponyms = tweet_data['hyponyms']
-    # if (hyponyms != ''):
-    #     if (hyponyms in staged_hyponyms):
-    #         ## increment that hyponyms
-    #         staged_hyponyms[hyponyms] += 1
-    #     else:
-    #         ## add hyponyms to list
-    #         staged_hyponyms[hyponyms] = 1
-
-
-    # # Sentiment - Bar 
-    # sentiment = tweet_data['sentiment']
-    # if (sentiment != ''):
-    #     if (sentiment in staged_sentiment):
-    #         ## increment that Sentiment
-    #         staged_sentiment[sentiment] += 1
-    #     else:
-    #         ## add Sentiment to list
-    #         staged_sentiment[sentiment] = 1
-
-
-
-
 staged_pos = sorted(staged_pos.items(),
                         key=operator.itemgetter(1), reverse=True)
 staged_length = sorted(staged_length.items(),
@@ -142,13 +117,6 @@ staged_topic = sorted(staged_topic.items(),
                      key=operator.itemgetter(1), reverse=True)
 staged_dict = sorted(staged_dict.items(),
                       key=operator.itemgetter(1), reverse=True)
-
-# print(staged_pos)
-# print(staged_length)
-# print(staged_named)
-# print(staged_topic)
-# print(staged_dict)
-
 
 # Visualize Results     
 x_axis=[]
@@ -169,8 +137,8 @@ for named in staged_named:
     x_axis.append(named[0])
     y_axis.append(named[1])
 data = [go.Bar(
-    x=x_axis,
-    y=y_axis
+    x=x_axis[1:],
+    y=y_axis[1:]
 )]
 py.plot(data, filename='named-entity-bar')
 
@@ -197,3 +165,27 @@ data = [go.Bar(
     y=y_axis
 )]
 py.plot(data, filename='dictionary-items-bar')
+
+# Visualize Results
+x_axis = []
+y_axis = []
+for length in staged_length:
+    x_axis.append(length[0])
+    y_axis.append(length[1])
+data = [go.Bar(
+    x=x_axis,
+    y=y_axis
+)]
+py.plot(data, filename='tweets-length-bar')
+
+
+# # Sentiment - Bar 
+# sentiment = tweet_data['sentiment']
+# if (sentiment != ''):
+#     if (sentiment in staged_sentiment):
+#         ## increment that Sentiment
+#         staged_sentiment[sentiment] += 1
+#     else:
+#         ## add Sentiment to list
+#         staged_sentiment[sentiment] = 1
+

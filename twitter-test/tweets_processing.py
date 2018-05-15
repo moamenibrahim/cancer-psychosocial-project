@@ -80,6 +80,9 @@ class functions(object):
         self.dictionary= enchant.Dict("en_US")
         time.sleep(7)
 
+    def segmentation(self, tweet):
+        return nltk.sent_tokenize(tweet)
+        
 
     def get_hashtags(self, tweet):
         """ Extracting Hashtags from tweets or text """
@@ -130,6 +133,15 @@ class functions(object):
         part of speech tagging extraction
         """
         staged_rows = {}
+
+        staged_nouns = {}
+        staged_verbs = {}
+        staged_determiner = {}
+        staged_adjective = {}
+        staged_pronoun = {}
+        staged_adverb = {}
+        staged_number = {}
+
         text = word_tokenize(str(tweet))
         result_postag = nltk.pos_tag(text)
         for row in result_postag:

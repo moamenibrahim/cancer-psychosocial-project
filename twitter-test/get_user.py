@@ -14,14 +14,14 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 auth_api = API(auth)
 
-f = open("get_user_results.json", "w+")
+f = open("get_user.json", "w+")
 
 def printRoutine(inputTxt):
     """ Method to print in a file and on screen for debugging purposes """
     f.write(str(inputTxt)+'\n')
 
-account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
-
+# account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
+account_list = [53292926]
 
 # threshold 7 tweets , max 30
 # account_list = [499649171, 499648091, 961153933,
@@ -54,9 +54,9 @@ if len(account_list) > 0:
         hashtags = []
         mentions = []
         tweet_count = 0
-        end_date = datetime.utcnow() - timedelta(days=30)
+        end_date = datetime.utcnow() - timedelta(days=3000)
         for status in Cursor(auth_api.user_timeline, id=target).items():
-            printRoutine (status._json)
+            printRoutine (status._json['text'])
             tweet_count += 1
             if hasattr(status, "entities"):
                 entities = status.entities
@@ -75,7 +75,8 @@ if len(account_list) > 0:
                             if name is not None:
                                 mentions.append(name)
             if status.created_at < end_date:
-                break
+                # break
+                pass
 
         print("Most mentioned Twitter users:")
         for item, count in Counter(mentions).most_common(10):

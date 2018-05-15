@@ -50,21 +50,23 @@ def analyze_file(fileName, tweet_count):
         if any(word in tweet for word in mylist):
             tweet_count = tweet_count + 1
 
-            if tweet_data['lang'] == 'fi':
-                processing.finnishParse(tweet, tweet_count)
-            
             # result = processing.remove_stopWords(tweet)
-            # link_extracted = processing.extract_link(tweet)
-            # guess_type_of(link_extracted)
             # databasePush(tweet_count, tweet_data)
             
             hastags = processing.get_hashtags(tweet)
             no_links_text, links = processing.strip_links(tweet)
+            # guess_type_of(links)
             pure_text = processing.strip_all_entities(no_links_text)
+
+            if tweet_data['lang'] == 'fi':
+                processing.finnishParse(pure_text, tweet_count)
+          
             translated = processing.get_translate(pure_text, tweet_data['lang'])
 
             if translated:
-                pos = processing.get_pos(translated)
+                sentences = processing.segmentation(translated)
+                for sentence in sentences:
+                    pos = processing.get_pos(translated)
                 dict_result = processing.check_dictionary(translated)
                 hyponyms = processing.get_hyponyms(translated)
                 named = processing.get_stanford_named_entity(translated)
@@ -89,6 +91,7 @@ def analyze_file(fileName, tweet_count):
 
 if __name__ == "__main__":
 
+    pos = []
     processing = functions()
     f = open("stream_results.json", "w+")
     tweet_count = 0

@@ -1,9 +1,5 @@
-a
-!
-?
--
-<a
 target="_blank"
+quot
 aiemmin
 aika
 aikaa

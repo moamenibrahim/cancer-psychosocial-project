@@ -3,14 +3,13 @@
 from os import listdir,remove
 import sys
 import ijson
-import operator
+#import operator
 from pprint import pprint
 import string
 import nltk
 
 import re
 
-removed = "This message has been removed by ."
 
 wordcount = {}
 
@@ -27,6 +26,8 @@ def search_keywords(string, keywords):
 
 #helper function to add word into the dictionary
 def addword(word,dist):
+    if dist>25:
+        return
     if word not in wordcount:
         wordcount[word] = addDistance(dist)
     else:
@@ -36,15 +37,17 @@ def addword(word,dist):
             obj[k] += vals[k]
 
 def addDistance(dist):
-    a = {"1-2":0,"3-5":0,"6-8":0,"8+":0}
+    a = {"1-2":0,"3-5":0,"6-8":0,"8-14":0,"15+":0}
     if dist<3:
         a["1-2"]+=1
     elif dist<6:
         a["3-5"]+=1
     elif dist<9:
         a["6-8"]+=1
+    elif dist<15:
+        a["8-14"]+=1
     else:
-        a["8+"]+=1
+        a["15+"]+=1
     return a
 
 #writing out to log-file the current contents of wordcount
@@ -63,10 +66,10 @@ def writeToFile():
         #r= 250 if len(sorted_wc) > 250 else len(sorted_wc)
         #for i in range(0, r):
         i = 0
-        for key,val in sorted(wordcount.items(), key= lambda i:sum(i[1].values()),reverse=True):
+        for key,val in sorted(wordcount.items(), key=lambda i:sum(i[1].values()),reverse=True):
             #print(key,val)
-            f.write("%s,%s,\n\t\t'total': %i,\n\t\t'1-2': %i, \n\t\t'3-5': %i, \n\t\t'6-8': %i,\n\t\t'8+': %i,\n\n" %
-            (key[0],key[1],int(sum(val.values())),int(val['1-2']),int(val['3-5']),int(val['6-8']),int(val['8+'])))
+            f.write("%s,%s,\n\t\t'total': %i,\n\t\t'1-2': %i, \n\t\t'3-5': %i, \n\t\t'6-8': %i,\n\t\t'8-14': %i,\n\t\t'15+': %i'\n\n" %
+            (key[0],key[1],sum(val.values()),val['1-2'],val['3-5'],val['6-8'],val['8-14'],val['15+']))
             if (i>300):
                 break
             i+=1
@@ -108,26 +111,21 @@ def addSentence(w):
         for j in range(i+1,len(wordlist)):
             #print("test1")
             #print(wordlist[i],wordlist[j])
-            if len(wordlist[i]) > 2 and len(wordlist[j]) > 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
+            if wordlist[i] == "<poistettu>" or wordlist[j] == "<poistettu>":
+                continue
+            if len(wordlist[i]) >= 2 and len(wordlist[j]) >= 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
                 #print("test2")
                 addword((wordlist[i],wordlist[j]),j-i)
 
 
-    """
-    cnt = len(w)
-    for i in range(0,cnt):
-        for j in range(i+1,cnt):
-            if w[i]!=w[j] and w[i] != " " and w[j] != " ":
-                if len(w[j])>3 and len(w[i])>3:
-                    addword((w[i],w[j]))
-    """
+
 #Helper function to remove odd characters from single words
 def checkWord(wrd):
     return re.sub(r'[^\w0-9]','',wrd)
 
 def checkSentence(string):
-    sents = nltk.sent_tokenize(string)
     ret = []
+    sents = nltk.sent_tokenize(string)
     for s in sents:
         tmp = ""
         if "http" in s:
@@ -135,11 +133,10 @@ def checkSentence(string):
             continue
         tokens = nltk.word_tokenize(s)
         for w in tokens:
-            if w is removed:
-                continue
             w=checkWord(w)
             if w.lower() in stopwords:
                 #print(w)
+                tmp+="<poistettu>"+" "
                 continue
             tmp+=w+" "
         ret.append(tmp)
@@ -156,22 +153,23 @@ for fileN in files:
         try:
             items = ijson.items(f,"item")
             for o in items:
-                if checkTopic(o["topics"],righttopics):
+                if checkTopic(o["topics"],righttopics) or o["deleted"] is True:
+                    #print(o["topics"],o["deleted"])
                     continue
                 body = o["body"]
-                body = checkSentence(body)
-                for sentence in body:
-                    if (search_keywords(sentence,keywords)==True):
+                if (search_keywords(body,keywords)==True):
+                    body = checkSentence(body)
+                    for sentence in body:
                         data["threads"]+=1
                         #clean = [word for word in sentence.split() if word.lower() not in stopwords]
                         addSentence(sentence)
-                    else:
-                        continue
-                for c in o["comments"]:
-                    sent = c["body"]
-                    sent = checkSentence(sent)
-                    for s in sent:
-                        if (search_keywords(s,keywords)==True):
+                    for c in o["comments"]:
+                        if c["deleted"] is True:
+                            continue
+                        sent = c["body"]
+                        #if (search_keywords(s,keywords)==True):
+                        sent = checkSentence(sent)
+                        for s in sent:
                             data["comments"]+=1
                             #cleanC = [word for word in body.split() if word.lower() not in stopwords]
                             addSentence(s)

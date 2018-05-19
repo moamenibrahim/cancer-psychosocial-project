@@ -64,13 +64,14 @@ def analyze_file(fileName, tweet_count):
             translated = processing.get_translate(pure_text, tweet_data['lang'])
 
             if translated:
+                pos = []
                 sentences = processing.segmentation(translated)
                 for sentence in sentences:
-                    pos = processing.get_pos(translated)
+                    pos.append = processing.get_pos(translated)
                 dict_result = processing.check_dictionary(translated)
                 hyponyms = processing.get_hyponyms(translated)
                 named = processing.get_stanford_named_entity(translated)
-                topic = processing.get_topic(translated)
+                topic = processing.get_topic(remove_stopWords(translated))
                 sentiment = processing.get_sentiment(translated)
                                 
                 data = {'tweet': tweet_count,
@@ -91,7 +92,6 @@ def analyze_file(fileName, tweet_count):
 
 if __name__ == "__main__":
 
-    pos = []
     processing = functions()
     f = open("stream_results.json", "w+")
     tweet_count = 0

@@ -98,8 +98,6 @@ class functions(object):
 
     def get_link(self, tweet):
         """ Extracting links from tweets or text """
-        # TODO : determine the link info and know whether it can be helpful for
-        # the study or no.
 
         regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
         match = re.search(regex, tweet)
@@ -161,7 +159,6 @@ class functions(object):
     def get_stanford_pos(self, tweet):
         """
         part of speech tagging extraction
-        TODO: standford tagger
         """
         path_to_model ='../../cancer/stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
         path_to_jar ='../../cancer/stanford/stanford-postagger/stanford-postagger.jar'
@@ -170,18 +167,22 @@ class functions(object):
         return result
 
 
-    def get_hyponyms(self, tweet):
+    def get_hyponyms(tweet):
         """ 
         hyponyms extraction and checking the topics list 
-        TODO: wordnet vs wordvector
         """
+        
         entities = {}
         words = tweet.split()
+        entities["Hyponyms"] = []
         for word in words:
-            for i, j in enumerate(wn.synsets(word)):
-                entities["Meaning:"+str(i)+" NLTK ID:"+str(j.name())] = []
-                entities["Meaning:"+str(i)+" NLTK ID:"+str(j.name())
-                        ].append("Hyponyms: "+str(j.hyponyms()))
+            for i, syn in enumerate(wn.synsets(word)):
+                if(i>3):
+                    pass
+                else:
+                    for hyponym in syn.hyponyms():
+                        for lemma in hyponym.lemmas():
+                            entities["Hyponyms"].append(lemma.name())
         return entities
 
 
@@ -196,11 +197,10 @@ class functions(object):
     def get_stanford_named_entity(self, tweet):
         """ 
         get named entity recognition and check if words have entry in lexical database 
-        TODO: Stanford named entity
         """
         stanford_dir = '../../cancer/stanford/stanford-nertagger/'
         jarfile = stanford_dir + 'stanford-ner.jar'
-        modelfile = stanford_dir + 'classifiers/english.all.3class.distsim.crf.ser.gz'
+        modelfile = stanford_dir + 'classifiers/english.muc.7class.distsim.crf.ser.gz'
         st = StanfordNERTagger(model_filename=modelfile, path_to_jar=jarfile)
         result = st.tag(tweet.split())
         return result

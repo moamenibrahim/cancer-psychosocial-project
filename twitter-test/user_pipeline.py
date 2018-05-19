@@ -16,13 +16,14 @@ def analyze_file(fileName, tweet_count):
             print('Tweet is only a link, no pure text')
             pass
         else:
+            pos=[]
             sentences = processing.segmentation(pure_text)
                 for sentence in sentences:
                     pos.append = processing.get_pos(sentence)
             dict_result = processing.check_dictionary(pure_text)
             hyponyms = processing.get_hyponyms(pure_text)
             named = processing.get_stanford_named_entity(pure_text)
-            topic = processing.get_topic(pure_text)
+            topic = processing.get_topic(processing.remove_stopWords(pure_text))
             sentiment = processing.get_sentiment(pure_text)
                                 
             data = {'tweet': tweet_count,
@@ -38,7 +39,6 @@ def analyze_file(fileName, tweet_count):
 
 if __name__ == "__main__":
 
-    pos=[]
     processing = functions()
     f = open("user_results.json", "w+")
     tweet_count = 0

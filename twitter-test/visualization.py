@@ -117,6 +117,8 @@ staged_topic = sorted(staged_topic.items(),
                      key=operator.itemgetter(1), reverse=True)
 staged_dict = sorted(staged_dict.items(),
                       key=operator.itemgetter(1), reverse=True)
+staged_lang = sorted(staged_lang.items(),
+                      key=operator.itemgetter(1), reverse=True)
 
 # Visualize Results     
 x_axis=[]
@@ -178,6 +180,19 @@ data = [go.Bar(
 )]
 py.plot(data, filename='tweets-length-bar')
 
+# Visualize Results
+x_axis = []
+y_axis = []
+for lang in staged_lang:
+    x_axis.append(lang[0])
+    y_axis.append(lang[1])
+data = [go.Bar(
+    x=x_axis,
+    y=y_axis
+)]
+py.plot(data, filename='tweets-lang-bar')
+
+print(staged_lang)
 
 # # Sentiment - Bar 
 # sentiment = tweet_data['sentiment']

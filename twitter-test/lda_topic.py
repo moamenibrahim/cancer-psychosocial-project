@@ -24,7 +24,7 @@ class lda_modeling(object):
 	def __init__(self):
 		pass
 
-	def train_lda(parameter_list):
+	def train_lda(self):
 
 		with open('newsgroups', 'rb') as f:
 			newsgroup_data = pickle.load(f)
@@ -57,8 +57,8 @@ class lda_modeling(object):
 		dictionary = corpora.Dictionary(texts)
 		doc_term_matrix = [dictionary.doc2bow(text) for text in texts]
 		Lda = gensim.models.ldamodel.LdaModel
-		ldamodel = Lda(doc_term_matrix, num_topics=3, id2word = dictionary, passes=300)
-		str = ldamodel.print_topics(num_topics=3, num_words=3)
+		ldamodel = Lda(doc_term_matrix, num_topics=1, id2word = dictionary, passes=300)
+		str = ldamodel.print_topics(num_topics=1, num_words=3)
 		s = tuple(str)
 		t = "\n".join(item[1] for item in s)
 		result = re.findall('[a-zA-Z]+',t)

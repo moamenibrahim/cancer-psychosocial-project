@@ -167,7 +167,7 @@ class functions(object):
         return result
 
 
-    def get_hyponyms(tweet):
+    def get_hyponyms(self,tweet):
         """ 
         hyponyms extraction and checking the topics list 
         """

@@ -67,11 +67,11 @@ def analyze_file(fileName, tweet_count):
                 pos = []
                 sentences = processing.segmentation(translated)
                 for sentence in sentences:
-                    pos.append = processing.get_pos(translated)
+                    pos.append(processing.get_pos(translated))
                 dict_result = processing.check_dictionary(translated)
                 hyponyms = processing.get_hyponyms(translated)
                 named = processing.get_stanford_named_entity(translated)
-                topic = processing.get_topic(remove_stopWords(translated))
+                topic = processing.get_topic(translated)
                 sentiment = processing.get_sentiment(translated)
                                 
                 data = {'tweet': tweet_count,

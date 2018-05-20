@@ -171,15 +171,15 @@ class functions(object):
         """ 
         hyponyms extraction and checking the topics list 
         """
-        
+
         entities = {}
         words = tweet.split()
-        entities["Hyponyms"] = []
         for word in words:
             for i, syn in enumerate(wn.synsets(word)):
                 if(i>3):
                     pass
                 else:
+                    entities["Hyponyms"] = []
                     for hyponym in syn.hyponyms():
                         for lemma in hyponym.lemmas():
                             entities["Hyponyms"].append(lemma.name())

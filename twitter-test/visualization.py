@@ -130,7 +130,27 @@ data = [go.Bar(
     x=x_axis,
     y=y_axis
 )]
-py.plot(data, filename='part-of-speech-bar')
+layout = go.Layout(
+    title='Part-of-speech-tagging',
+    xaxis=dict(
+        title='POS',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of occurence in total',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='part-of-speech-bar-2')
 
 # Visualize Results     
 x_axis=[]
@@ -142,7 +162,27 @@ data = [go.Bar(
     x=x_axis[1:],
     y=y_axis[1:]
 )]
-py.plot(data, filename='named-entity-bar')
+layout = go.Layout(
+    title='Named entity',
+    xaxis=dict(
+        title='Entities',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of occurence in total',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='named-entity-bar-2')
 
 # Visualize Results     
 x_axis=[]
@@ -154,7 +194,27 @@ data = [go.Bar(
     x=x_axis,
     y=y_axis
 )]
-py.plot(data, filename='topics-bar')
+layout = go.Layout(
+    title='Extracted topics',
+    xaxis=dict(
+        title='Topics',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of occurence in total',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='topics-bar-2')
 
 # Visualize Results     
 x_axis=[]
@@ -166,7 +226,27 @@ data = [go.Bar(
     x=x_axis,
     y=y_axis
 )]
-py.plot(data, filename='dictionary-items-bar')
+layout = go.Layout(
+    title='Dictionary hits',
+    xaxis=dict(
+        title='Percentage of success',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of occurence in total (tweets)',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='dictionary-items-bar-2')
 
 # Visualize Results
 x_axis = []
@@ -178,7 +258,27 @@ data = [go.Bar(
     x=x_axis,
     y=y_axis
 )]
-py.plot(data, filename='tweets-length-bar')
+layout = go.Layout(
+    title='Tweets length',
+    xaxis=dict(
+        title='characters',    #EDIT 
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of occurence',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='tweets-length-bar-2')
 
 # Visualize Results
 x_axis = []
@@ -190,9 +290,28 @@ data = [go.Bar(
     x=x_axis,
     y=y_axis
 )]
-py.plot(data, filename='tweets-lang-bar')
+layout = go.Layout(
+    title='Language dispersion',
+    xaxis=dict(
+        title='Languages',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of tweets',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='tweets-lang-bar-2')
 
-print(staged_lang)
 
 # # Sentiment - Bar 
 # sentiment = tweet_data['sentiment']

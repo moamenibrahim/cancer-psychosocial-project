@@ -1,0 +1,42 @@
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Dependencies and temp files
+finnish-dep-parser-python3/LIBS-LOCAL/
+finnish-dep-parser-python3/model/fin_model.marmot
+finnish-dep-parser-python3/tmp_data/
+finnish-dep-parser-python3/*~

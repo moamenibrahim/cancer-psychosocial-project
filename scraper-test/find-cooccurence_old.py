@@ -7,7 +7,7 @@ import ijson
 from pprint import pprint
 import string
 import nltk
-
+import finnish_keywords as keywords
 import re
 
 
@@ -19,24 +19,63 @@ data = {"threads" : 0,
 
 #check if one of the keywords exist in the given string
 def search_keywords(string, keywords):
-    for word in keywords:
+    keywords_found=[]
+    #keywords_found={"death":0,"illness":0,"treatment":0,"social":0,"financial":0}
+    for word in keywords.death_list:
         if word in string.lower():
-            return True
-        return False
+            keywords_found.append("death")
+            #keywords_found["death"]=1
+            break
+    for word in keywords.illness_list:
+        if word in string.lower():
+            keywords_found.append("illness")
+            #keywords_found["illness"]=1
+            break
+    for word in keywords.treatment_list:
+        if word in string.lower():
+            keywords_found.append("treatment")
+            #keywords_found["treatment"]=1
+            break
+    for word in keywords.social_list:
+        if word in string.lower():
+            keywords_found.append("social")
+            #keywords_found["social"]=1
+            break
+    for word in keywords.financial_list:
+        if word in string.lower():
+            keywords_found.append("financial")
+            #keywords_found["financial"]=1
+            break
+    return keywords_found
 
 #helper function to add word into the dictionary
-def addword(word,dist):
+def addword(word,dist,topics,foundKeywords):
     if dist>25:
         return
     if word not in wordcount:
-        wordcount[word] = addDistance(dist)
+        wordcount[word] = addDistance(dist,topics)
+        wordcount[word]["keyWords"]=addKeywords(foundKeywords)
     else:
-        vals = addDistance(dist)
+        vals = addDistance(dist,topics)
+        kvals = addKeywords(foundKeywords)
         obj = wordcount[word]
-        for k in vals:
-            obj[k] += vals[k]
+        addStuff(obj,vals)
+        addStuff(obj["keyWords"],kvals)
 
-def addDistance(dist):
+def addStuff(obj,vals):
+    for k in vals:
+        try:
+            obj[k] += vals[k]
+        except KeyError:
+            obj[k] = vals[k]
+
+def addKeywords(kWords):
+    keywords = {"death":0,"illness":0,"treatment":0,"social":0,"financial":0}
+    for w in kWords:
+        keywords[w]+=1
+    return keywords
+
+def addDistance(dist,topics):
     a = {"1-2":0,"3-5":0,"6-8":0,"8-14":0,"15+":0}
     if dist<3:
         a["1-2"]+=1
@@ -48,6 +87,8 @@ def addDistance(dist):
         a["8-14"]+=1
     else:
         a["15+"]+=1
+    for t in topics:
+        a[t]=1
     return a
 
 #writing out to log-file the current contents of wordcount
@@ -66,10 +107,19 @@ def writeToFile():
         #r= 250 if len(sorted_wc) > 250 else len(sorted_wc)
         #for i in range(0, r):
         i = 0
-        for key,val in sorted(wordcount.items(), key=lambda i:sum(i[1].values()),reverse=True):
+        for key,val in sorted(wordcount.items(), key=lambda i:sum([i[1]['1-2'],i[1]['3-5'],i[1]['6-8'],i[1]['8-14'],i[1]['15+']]),reverse=True):
             #print(key,val)
-            f.write("%s,%s,\n\t\t'total': %i,\n\t\t'1-2': %i, \n\t\t'3-5': %i, \n\t\t'6-8': %i,\n\t\t'8-14': %i,\n\t\t'15+': %i'\n\n" %
-            (key[0],key[1],sum(val.values()),val['1-2'],val['3-5'],val['6-8'],val['8-14'],val['15+']))
+            f.write("%s,%s,\n\t\t'total': %i,\n\t\t'1-2': %i, \n\t\t'3-5': %i, \n\t\t'6-8': %i,\n\t\t'8-14': %i,\n\t\t'15+': %i\n\t\t" %
+            (key[0],key[1],sum([val['1-2'],val['3-5'],val['6-8'],val['8-14'],val['15+']]),
+            val['1-2'],val['3-5'],val['6-8'],val['8-14'],val['15+']))
+            f.write("keywords: \n")
+            for k in val["keyWords"]:
+                f.write("\t\t\t%s: %i\n"%(k,val["keyWords"][k]))
+            f.write("Topics: \n")
+            for v in val:
+                if v not in ['1-2','3-5','6-8','8-14','15+','keyWords']:
+                     f.write("\t\t\t%s : %i\n"% (v,val[v]))
+            f.write("\n")
             if (i>300):
                 break
             i+=1
@@ -79,14 +129,15 @@ def writeToFile():
 
 #Load keywords and stopwords, and define characters to be removed
 toberemoved = ["<p>","</p>",",","?","!","-"]
-
+"""
 keyword_file = open("./finnish_keywords.txt","r")
 sents = keyword_file.read().split(",")
 keywords = sents[0].split("\n")
 keyword_file.close()
+"""
 
-
-righttopics = ["Paikkakunnat","Terveys"]
+righttopics = ["Terveys"]
+#rightSubtopics=["Syöpä",""]
 stopwords_file = open("./finnish_stopwords.txt","r")
 lines = stopwords_file.read().split(",")
 stopwords = lines[0].split("\n")
@@ -102,9 +153,21 @@ def checkTopic(topics,righttopics):
     for topic in topics:
         if topic["title"] in righttopics:
             return False
+            #return checkSubtopic(topics)
     return True
+
+#def checkSubtopic(topics)
+
+#helper function to extract onlif keywords_found:
+
+def extractTopics(topics):
+    retTopics=[]
+    for t in topics:
+        retTopics.append(t["title"])
+    return retTopics
+
 #Handling final checks of the sentences before actual words are added
-def addSentence(w):
+def addSentence(w,topics,foundKeywords):
     #print(w)
     wordlist=[word for word in w.split()]
     for i in range(len(wordlist)):
@@ -113,9 +176,9 @@ def addSentence(w):
             #print(wordlist[i],wordlist[j])
             if wordlist[i] == "<poistettu>" or wordlist[j] == "<poistettu>":
                 continue
-            if len(wordlist[i]) >= 2 and len(wordlist[j]) >= 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
+            if len(wordlist[i]) > 2 and len(wordlist[j]) > 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
                 #print("test2")
-                addword((wordlist[i],wordlist[j]),j-i)
+                addword((wordlist[i],wordlist[j]),j-i,topics,foundKeywords)
 
 
 
@@ -156,13 +219,17 @@ for fileN in files:
                 if checkTopic(o["topics"],righttopics) or o["deleted"] is True:
                     #print(o["topics"],o["deleted"])
                     continue
+                topics=extractTopics(o["topics"])
                 body = o["body"]
-                if (search_keywords(body,keywords)==True):
+                foundKeywords = search_keywords(body,keywords)
+                if foundKeywords:
+                    #fKeyWords = foundKeywords.copy()
                     body = checkSentence(body)
                     for sentence in body:
                         data["threads"]+=1
                         #clean = [word for word in sentence.split() if word.lower() not in stopwords]
-                        addSentence(sentence)
+                        #print(foundKeywords)
+                        addSentence(sentence,topics,foundKeywords)
                     for c in o["comments"]:
                         if c["deleted"] is True:
                             continue
@@ -172,7 +239,7 @@ for fileN in files:
                         for s in sent:
                             data["comments"]+=1
                             #cleanC = [word for word in body.split() if word.lower() not in stopwords]
-                            addSentence(s)
+                            addSentence(s,topics,foundKeywords)
 
         except ValueError:
             print("ValueError")

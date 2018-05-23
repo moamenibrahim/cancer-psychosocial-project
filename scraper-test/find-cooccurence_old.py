@@ -9,39 +9,66 @@ import string
 import nltk
 import finnish_keywords as keywords
 import re
+import pyrebase
 
+
+pyrebase_config = {
+    "apiKey": "AIzaSyBIJYd5Xxa7DIORsLPJUCT2r4DqUa_bxlo",
+    "authDomain": "analysis-820dc.firebaseapp.com",
+    "databaseURL": "https://analysis-820dc.firebaseio.com",
+    #projectId: "analysis-820dc",
+    "storageBucket": "analysis-820dc.appspot.com",
+    #messagingSenderId: "863565878024",
+    "servicAccount": "./firebase-config/config.json"
+}
+
+firebase = pyrebase.initialize_app(pyrebase_config)
+db = firebase.database()
 
 wordcount = {}
+
+kw=db.child("keywords").get()
 
 data = {"threads" : 0,
         "comments" : 0,
         "wordpairs" : 0}
 
+def pushFirebase(table,json_data):
+    db.child(table).push(json_data)
+
+def updateFirebase(table,entry,json_data):
+    db.child(table).child(entry).update(json_data)
+
+def delFirebase(table,entry):
+    db.child(table).child(entry).remove()
+
+
+
 #check if one of the keywords exist in the given string
-def search_keywords(string, keywords):
+def search_keywords(string):
     keywords_found=[]
     #keywords_found={"death":0,"illness":0,"treatment":0,"social":0,"financial":0}
-    for word in keywords.death_list:
+    for word in kw.val()["death"]:
         if word in string.lower():
             keywords_found.append("death")
             #keywords_found["death"]=1
             break
-    for word in keywords.illness_list:
+    for word in kw.val()["illness"]:
         if word in string.lower():
             keywords_found.append("illness")
             #keywords_found["illness"]=1
             break
-    for word in keywords.treatment_list:
+    for word in kw.val()["treatment"]:
         if word in string.lower():
             keywords_found.append("treatment")
             #keywords_found["treatment"]=1
             break
-    for word in keywords.social_list:
+    for word in kw.val()["social"]:
         if word in string.lower():
             keywords_found.append("social")
             #keywords_found["social"]=1
             break
-    for word in keywords.financial_list:
+    for word in kw.val()["financial"]:
         if word in string.lower():
             keywords_found.append("financial")
             #keywords_found["financial"]=1
@@ -53,14 +80,18 @@ def addword(word,dist,topics,foundKeywords):
     if dist>25:
         return
     if word not in wordcount:
-        wordcount[word] = addDistance(dist,topics)
-        wordcount[word]["keyWords"]=addKeywords(foundKeywords)
+        wordcount[word] = {}
+        wordcount[word]["wordDistance"]=addDistance(dist)
+        wordcount[word]["topics"]=formatIntoDict(topics)
+        wordcount[word]["keyWords"]=formatIntoDict(foundKeywords)
     else:
-        vals = addDistance(dist,topics)
-        kvals = addKeywords(foundKeywords)
+        vals = addDistance(dist)
+        kvals = formatIntoDict(foundKeywords)
+        tvals = formatIntoDict(topics)
         obj = wordcount[word]
-        addStuff(obj,vals)
+        addStuff(obj["wordDistance"],vals)
         addStuff(obj["keyWords"],kvals)
+        addStuff(obj["topics"],tvals)
 
 def addStuff(obj,vals):
     for k in vals:
@@ -69,27 +100,30 @@ def addStuff(obj,vals):
         except KeyError:
             obj[k] = vals[k]
 
-def addKeywords(kWords):
-    keywords = {"death":0,"illness":0,"treatment":0,"social":0,"financial":0}
-    for w in kWords:
-        keywords[w]+=1
-    return keywords
+def formatIntoDict(items):
+    itemList={}
+    for w in items:
+        itemList[w]=1
+    return itemList
 
-def addDistance(dist,topics):
-    a = {"1-2":0,"3-5":0,"6-8":0,"8-14":0,"15+":0}
+def addDistance(dist):
+    #a = {"1-2":0,"3-5":0,"6-8":0,"8-14":0,"15+":0}
+    a={}
     if dist<3:
-        a["1-2"]+=1
+        a["1-2"]=1
     elif dist<6:
-        a["3-5"]+=1
+        a["3-5"]=1
     elif dist<9:
-        a["6-8"]+=1
+        a["6-8"]=1
     elif dist<15:
-        a["8-14"]+=1
+        a["8-14"]=1
     else:
-        a["15+"]+=1
-    for t in topics:
-        a[t]=1
+        a["15+"]=1
     return a
+
+def writeToDatabase():
+    for key,val in sorted(wordcount.items(), key=lambda i:sum(i[1]["wordDistance"].values()),reverse=True):
+        db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).set(val)
 
 #writing out to log-file the current contents of wordcount
 def writeToFile():
@@ -105,7 +139,7 @@ def writeToFile():
         f.write("Threads: %s,Comments: %s\n" %(data["threads"],data["comments"]))
         f.write("Most common wordpairs in text: \n\n")
         #r= 250 if len(sorted_wc) > 250 else len(sorted_wc)
-        #for i in range(0, r):
+        #for i in range(0, r):,keyword
         i = 0
         for key,val in sorted(wordcount.items(), key=lambda i:sum([i[1]['1-2'],i[1]['3-5'],i[1]['6-8'],i[1]['8-14'],i[1]['15+']]),reverse=True):
             #print(key,val)
@@ -213,6 +247,7 @@ for fileN in files:
         continue
     with open(filename) as f:
         print(filename)
+        wordcount={}
         try:
             items = ijson.items(f,"item")
             for o in items:
@@ -221,7 +256,7 @@ for fileN in files:
                     continue
                 topics=extractTopics(o["topics"])
                 body = o["body"]
-                foundKeywords = search_keywords(body,keywords)
+                foundKeywords = search_keywords(body)
                 if foundKeywords:
                     #fKeyWords = foundKeywords.copy()
                     body = checkSentence(body)
@@ -240,13 +275,13 @@ for fileN in files:
                             data["comments"]+=1
                             #cleanC = [word for word in body.split() if word.lower() not in stopwords]
                             addSentence(s,topics,foundKeywords)
-
         except ValueError:
             print("ValueError")
             continue
         except ijson.common.IncompleteJSONError:
             print("IncompleteJSONError")
             continue
-        writeToFile()
+    writeToDatabase()
+    #writeToFile()
 
 #pprint(data)

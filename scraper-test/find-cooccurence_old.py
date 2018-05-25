@@ -121,9 +121,22 @@ def addDistance(dist):
         a["15+"]=1
     return a
 
+def addNewValues(dbobj,newobj):
+    addStuff(dbobj["wordDistance"],newobj["wordDistance"])
+    addStuff(dbobj["topics"],newobj["topics"])
+    addStuff(dbobj["keyWords"],newobj["keyWords"])
+    return dbobj
+
 def writeToDatabase():
     for key,val in sorted(wordcount.items(), key=lambda i:sum(i[1]["wordDistance"].values()),reverse=True):
-        db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).set(val)
+        if sum(val["wordDistance"].values())<4:
+            break
+        try:
+            currVals=db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).get()
+            retVal=addNewValues(currVals.val(),val)
+            db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).update(retVal)
+        except:
+            db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).set(val)
 
 #writing out to log-file the current contents of wordcount
 def writeToFile():

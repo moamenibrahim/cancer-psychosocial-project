@@ -20,10 +20,25 @@ staged_named = {}
 staged_sentiment = {}
 staged_topic = {}
 staged_dict = {}
+staged_named_count={}
 
 # Get and populate results
 for line in f.readlines():
     tweet_data = json.loads(line)
+
+    try:
+        # Named count - Bar 
+        named_count = tweet_data['Named count']
+        print(named_count)
+        if (named_count != ''):
+            if (named_count in staged_named_count):
+                ## increment that named_count
+                staged_named_count[named_count] += 1
+            else:
+                ## add named_count to list
+                staged_named_count[named_count] = 1    
+    except:
+        print("didn't get this one - named count")
 
 
     # Length - Bar 
@@ -119,6 +134,10 @@ staged_dict = sorted(staged_dict.items(),
                       key=operator.itemgetter(1), reverse=True)
 staged_lang = sorted(staged_lang.items(),
                       key=operator.itemgetter(1), reverse=True)
+staged_named_count = sorted(staged_named_count.items(),
+                      key=operator.itemgetter(1), reverse=True)
+
+print(staged_named_count)
 
 # Visualize Results     
 x_axis=[]
@@ -312,6 +331,38 @@ layout = go.Layout(
 fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='tweets-lang-bar-2')
 
+
+# Visualize Results
+x_axis = []
+y_axis = []
+for named_count in staged_named_count:
+    x_axis.append(named_count[0])
+    y_axis.append(named_count[1])
+data = [go.Bar(
+    x=x_axis,
+    y=y_axis
+)]
+layout = go.Layout(
+    title='Named entity detected frequency',
+    xaxis=dict(
+        title='Number of named entities detected',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Number of times detected',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='named-count-detected-bar-2')
 
 # # Sentiment - Bar 
 # sentiment = tweet_data['sentiment']

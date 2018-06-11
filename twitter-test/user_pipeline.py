@@ -1,4 +1,4 @@
-import json
+import json,re
 from tweets_processing import functions
 
 def analyze_file(fileName, tweet_count):
@@ -17,6 +17,7 @@ def analyze_file(fileName, tweet_count):
             pass
         else:
             pos=[]
+            Named_count=0
             sentences = processing.segmentation(pure_text)
             for sentence in sentences:
                 pos.append(processing.get_pos(sentence))

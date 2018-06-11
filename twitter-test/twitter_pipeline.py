@@ -1,4 +1,4 @@
-import json
+import json,re
 from tweets_processing import functions
 
 """ A list contains the query words to search for """
@@ -65,6 +65,7 @@ def analyze_file(fileName, tweet_count):
 
             if translated:
                 pos = []
+                Named_count=0
                 sentences = processing.segmentation(translated)
                 for sentence in sentences:
                     pos.append(processing.get_pos(translated))

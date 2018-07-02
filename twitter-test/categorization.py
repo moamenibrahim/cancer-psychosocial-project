@@ -10,7 +10,7 @@ import operator
 plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
 
-f = open("get_user_results.json", "r")
+f = open("stream_results.json", "r")
 
 
 """ list for family related keywords and queries """

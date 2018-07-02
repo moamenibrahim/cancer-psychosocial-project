@@ -72,8 +72,8 @@ class functions(object):
         self.lda = lda_modeling()
         self.stop_words = set(stopwords.words('english'))
         self.NLP_understanding = AlchemyNLPunderstanding()
-        self.tagger = geniatagger.GeniaTagger(
-            '../../cancer/geniatagger-3.0.2/geniatagger')
+        # self.tagger = geniatagger.GeniaTagger(
+        #     '../../cancer/geniatagger-3.0.2/geniatagger')
         self.firebase = pyrebase.initialize_app(config)
         self.auth = self.firebase.auth()
         self.db = self.firebase.database()
@@ -252,12 +252,12 @@ class functions(object):
                 return False
 
 
-    def get_Geniapos(self, tweet):
-        """ Genia Tagger part of speech tagging extraction
-        Medical part of speech tagger """
+    # def get_Geniapos(self, tweet):
+    #     """ Genia Tagger part of speech tagging extraction
+    #     Medical part of speech tagger """
 
-        out = self.tagger.parse(tweet)
-        return out
+    #     out = self.tagger.parse(tweet)
+    #     return out
 
 
     def get_sentiment(self, input_str):

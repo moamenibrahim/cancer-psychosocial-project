@@ -8,13 +8,13 @@ import plotly
 import operator
 from nltk.corpus import stopwords
 
+
 plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
 
-f = open("stream_results.json", "r")
+f = open("user_results.json", "r")
 
 staged_pos = {}
-staged_lang = {}
 staged_hyponyms = {}
 staged_length = {}
 staged_named = {}
@@ -41,7 +41,6 @@ for line in f.readlines():
     except:
         print("didn't get this one - named count")
 
-
     # Length - Bar 
     length = tweet_data['tweet length']
     if (length != ''):
@@ -51,17 +50,6 @@ for line in f.readlines():
         else:
             ## add length to list
             staged_length[length] = 1
-
-
-    # Language - Bar 
-    lang = tweet_data['lang']
-    if (lang != ''):
-        if (lang in staged_lang):
-            ## increment that lang
-            staged_lang[lang] += 1
-        else:
-            ## add lang to list
-            staged_lang[lang] = 1
 
 
     # Dictionary - sucess rate bar 
@@ -97,17 +85,18 @@ for line in f.readlines():
     try:
         all_topic = tweet_data['topic']
         filtered_topics = [w for w in all_topic if not w in set(stopwords.words('english'))]
-
-        for topic in filtered_topics:
-            if (topic != ''):
-                if (topic in staged_topic):
-                    ## increment that topic
-                    staged_topic[topic] += 1
-                else:
-                    ## add topic to list
-                    staged_topic[topic] = 1
+        if(len(filtered_topics)>3):
+            print(len(filtered_topics))
+            for topic in filtered_topics:
+                if (topic != '' and len(topic)>3):
+                    if (topic in staged_topic):
+                        ## increment that topic
+                        staged_topic[topic] += 1
+                    else:
+                        ## add topic to list
+                        staged_topic[topic] = 1
     except:
-        print("didn't get this one - topic")
+        print("didn't translate this one - topic")
 
 
     # Named-entity - Scatter
@@ -124,6 +113,19 @@ for line in f.readlines():
     except:
         print("didn't translate this one - named entity")
 
+    # # Named-entity-count - Scatter
+    # try:
+    #     all_named_count = tweet_data['Named Count']
+    #     for named in all_named_count:
+    #         if (named[1] != ''):
+    #             if (named[1] in staged_named_count):
+    #                 ## increment that named
+    #                 staged_named_count[named[1]] += 1
+    #             else:
+    #                 ## add named to list
+    #                 staged_named_count[named[1]] = 1    
+    # except:
+    #     print("didn't translate this one - named entity")
 
 staged_pos = sorted(staged_pos.items(),
                         key=operator.itemgetter(1), reverse=True)
@@ -134,8 +136,6 @@ staged_named = sorted(staged_named.items(),
 staged_topic = sorted(staged_topic.items(),
                      key=operator.itemgetter(1), reverse=True)
 staged_dict = sorted(staged_dict.items(),
-                      key=operator.itemgetter(1), reverse=True)
-staged_lang = sorted(staged_lang.items(),
                       key=operator.itemgetter(1), reverse=True)
 staged_named_count = sorted(staged_named_count.items(),
                       key=operator.itemgetter(1), reverse=True)
@@ -170,7 +170,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='part-of-speech-bar-2')
+py.plot(fig, filename='part-of-speech-bar-user')
 
 # Visualize Results     
 x_axis=[]
@@ -202,7 +202,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='named-entity-bar-2')
+py.plot(fig, filename='named-entity-bar-user')
 
 # Visualize Results     
 x_axis=[]
@@ -234,7 +234,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='topics-bar-2')
+py.plot(fig, filename='topics-bar-user')
 
 # Visualize Results     
 x_axis=[]
@@ -266,7 +266,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='dictionary-items-bar-2')
+py.plot(fig, filename='dictionary-items-bar-user')
 
 # Visualize Results
 x_axis = []
@@ -298,40 +298,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='tweets-length-bar-2')
-
-# Visualize Results
-x_axis = []
-y_axis = []
-for lang in staged_lang:
-    x_axis.append(lang[0])
-    y_axis.append(lang[1])
-data = [go.Bar(
-    x=x_axis,
-    y=y_axis
-)]
-layout = go.Layout(
-    title='Language dispersion',
-    xaxis=dict(
-        title='Languages',
-        titlefont=dict(
-            family='Courier New, monospace',
-            size=18,
-            color='#7f7f7f'
-        )
-    ),
-    yaxis=dict(
-        title='Number of tweets',
-        titlefont=dict(
-            family='Courier New, monospace',
-            size=18,
-            color='#7f7f7f'
-        )
-    )
-)
-fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='tweets-lang-bar-2')
-
+py.plot(fig, filename='tweets-length-bar-user')
 
 # Visualize Results
 x_axis = []
@@ -364,3 +331,14 @@ layout = go.Layout(
 )
 fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='named-count-detected-bar-2')
+
+# # Sentiment - Bar 
+# sentiment = tweet_data['sentiment']
+# if (sentiment != ''):
+#     if (sentiment in staged_sentiment):
+#         ## increment that Sentiment
+#         staged_sentiment[sentiment] += 1
+#     else:
+#         ## add Sentiment to list
+#         staged_sentiment[sentiment] = 1
+

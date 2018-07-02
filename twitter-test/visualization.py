@@ -139,6 +139,11 @@ staged_lang = sorted(staged_lang.items(),
                       key=operator.itemgetter(1), reverse=True)
 staged_named_count = sorted(staged_named_count.items(),
                       key=operator.itemgetter(1), reverse=True)
+<<<<<<< HEAD
+=======
+
+print(staged_named_count)
+>>>>>>> 9f7ea3ff840a8dbc39bcc4a2b5d3c99da42ebfdd
 
 # Visualize Results     
 x_axis=[]
@@ -364,3 +369,17 @@ layout = go.Layout(
 )
 fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='named-count-detected-bar-2')
+<<<<<<< HEAD
+=======
+
+# # Sentiment - Bar 
+# sentiment = tweet_data['sentiment']
+# if (sentiment != ''):
+#     if (sentiment in staged_sentiment):
+#         ## increment that Sentiment
+#         staged_sentiment[sentiment] += 1
+#     else:
+#         ## add Sentiment to list
+#         staged_sentiment[sentiment] = 1
+
+>>>>>>> 9f7ea3ff840a8dbc39bcc4a2b5d3c99da42ebfdd

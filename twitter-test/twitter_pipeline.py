@@ -138,7 +138,12 @@ def analyze_file(fileName, tweet_count):
             print(translated)
             if translated:
                 pos = []
+<<<<<<< HEAD
                 sentences = processing.segmentation(u"%s"%str(translated))
+=======
+                Named_count=0
+                sentences = processing.segmentation(translated)
+>>>>>>> 9f7ea3ff840a8dbc39bcc4a2b5d3c99da42ebfdd
                 for sentence in sentences:
                     pos.append(processing.get_pos(u"%s"%str(translated)))
                 dict_result = processing.check_dictionary(u"%s"%str(translated))

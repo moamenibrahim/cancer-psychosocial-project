@@ -10,6 +10,7 @@ import nltk
 import finnish_keywords as keywords
 import re
 import pyrebase
+import datetime
 
 
 pyrebase_config = {
@@ -27,7 +28,7 @@ db = firebase.database()
 
 wordcount = {}
 
-kw=db.child("keywords").get()
+#kw=db.child("keywords").get()
 
 data = {"threads" : 0,
         "comments" : 0,
@@ -76,22 +77,37 @@ def search_keywords(string):
     return keywords_found
 
 #helper function to add word into the dictionary
-def addword(word,dist,topics,foundKeywords):
+def addword(word,dist,topics,comment,time,nicknames):
     if dist>25:
         return
     if word not in wordcount:
         wordcount[word] = {}
         wordcount[word]["wordDistance"]=addDistance(dist)
-        wordcount[word]["topics"]=formatIntoDict(topics)
-        wordcount[word]["keyWords"]=formatIntoDict(foundKeywords)
+        wordcount[word]["subforums"]=formatIntoDict(topics)
+        #wordcount[word]["keyWords"]=formatIntoDict(foundKeywords)
+        wordcount[word]["isComment"]=isComment(comment)
+        wordcount[word]["nicknames"]=formatIntoDict(nicknames)
+        wordcount[word]["postTimes"]=formatIntoDict(time)
     else:
         vals = addDistance(dist)
-        kvals = formatIntoDict(foundKeywords)
+        #kvals = formatIntoDict(foundKeywords)
         tvals = formatIntoDict(topics)
+        nvals = formatIntoDict(nicknames)
+        timevals=formatIntoDict(time)
+        cvals = isComment(comment)
         obj = wordcount[word]
         addStuff(obj["wordDistance"],vals)
-        addStuff(obj["keyWords"],kvals)
-        addStuff(obj["topics"],tvals)
+        #addStuff(obj["keyWords"],kvals)
+        addStuff(obj["subforums"],tvals)
+        addStuff(obj["nicknames"],nvals)
+        addStuff(obj["postTimes"],timevals)
+        addStuff(obj["isComment"],cvals)
+
+def isComment(b):
+    if b:
+        return {"inComments":1}
+    else:
+        return {"inTopic":1}
 
 def addStuff(obj,vals):
     for k in vals:
@@ -124,20 +140,20 @@ def addDistance(dist):
 def addNewValues(dbobj,newobj):
     addStuff(dbobj["wordDistance"],newobj["wordDistance"])
     addStuff(dbobj["topics"],newobj["topics"])
-    addStuff(dbobj["keyWords"],newobj["keyWords"])
+    #addStuff(dbobj["keyWords"],newobj["keyWords"])
     return dbobj
 
 def writeToDatabase():
     for key,val in sorted(wordcount.items(), key=lambda i:sum(i[1]["wordDistance"].values()),reverse=True):
-        if sum(val["wordDistance"].values())<4:
-            break
         try:
-            currVals=db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).get()
+            currVals=db.child("co-occurrences-all").child("%s-%s"%(key[0],key[1])).get()
             retVal=addNewValues(currVals.val(),val)
-            db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).update(retVal)
+            db.child("co-occurrences-all").child("%s-%s"%(key[0],key[1])).update(retVal)
         except:
-            db.child("co-occurrences").child("%s-%s"%(key[0],key[1])).set(val)
-
+            try:
+                db.child("co-occurrences-all").child("%s-%s"%(key[0],key[1])).set(val)
+            except:
+                continue
 #writing out to log-file the current contents of wordcount
 def writeToFile():
     try:
@@ -214,7 +230,7 @@ def extractTopics(topics):
     return retTopics
 
 #Handling final checks of the sentences before actual words are added
-def addSentence(w,topics,foundKeywords):
+def addSentence(w,topics,comment,time,nicknames):
     #print(w)
     wordlist=[word for word in w.split()]
     for i in range(len(wordlist)):
@@ -225,7 +241,7 @@ def addSentence(w,topics,foundKeywords):
                 continue
             if len(wordlist[i]) > 2 and len(wordlist[j]) > 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
                 #print("test2")
-                addword((wordlist[i],wordlist[j]),j-i,topics,foundKeywords)
+                addword((wordlist[i],wordlist[j]),j-i,topics,comment,time,nicknames)
 
 
 
@@ -238,19 +254,31 @@ def checkSentence(string):
     sents = nltk.sent_tokenize(string)
     for s in sents:
         tmp = ""
-        if "http" in s:
+        if "http" in s or "json" in s:
             #print("http")
             continue
         tokens = nltk.word_tokenize(s)
         for w in tokens:
             w=checkWord(w)
-            if w.lower() in stopwords:
+            w=w.lower()
+            if w in stopwords:
                 #print(w)
                 tmp+="<poistettu>"+" "
                 continue
             tmp+=w+" "
         ret.append(tmp)
     return ret
+
+def getValueIntoList(val):
+    ret = []
+
+    ret.append(val)
+    return ret
+def getDateString(unixts):
+    obj=[]
+    d=datetime.datetime.fromtimestamp(unixts/1000).strftime("%m-%Y")
+    obj.append(d)
+    return obj
 
 
 for fileN in files:
@@ -260,41 +288,56 @@ for fileN in files:
         continue
     with open(filename) as f:
         print(filename)
-        wordcount={}
+
         try:
             items = ijson.items(f,"item")
             for o in items:
-                if checkTopic(o["topics"],righttopics) or o["deleted"] is True:
+                if o["deleted"] is True:
+                    #checkTopic(o["topics"],righttopics) or #extra check above
                     #print(o["topics"],o["deleted"])
                     continue
                 topics=extractTopics(o["topics"])
                 body = o["body"]
-                foundKeywords = search_keywords(body)
-                if foundKeywords:
+                #foundKeywords = search_keywords(body)
+                #if foundKeywords:
                     #fKeyWords = foundKeywords.copy()
-                    body = checkSentence(body)
-                    for sentence in body:
-                        data["threads"]+=1
-                        #clean = [word for word in sentence.split() if word.lower() not in stopwords]
-                        #print(foundKeywords)
-                        addSentence(sentence,topics,foundKeywords)
-                    for c in o["comments"]:
-                        if c["deleted"] is True:
-                            continue
-                        sent = c["body"]
-                        #if (search_keywords(s,keywords)==True):
-                        sent = checkSentence(sent)
-                        for s in sent:
-                            data["comments"]+=1
-                            #cleanC = [word for word in body.split() if word.lower() not in stopwords]
-                            addSentence(s,topics,foundKeywords)
+                body = checkSentence(body)
+                timestamp = getDateString(o["created_at"])
+                anonnick = getValueIntoList(o["anonnick"])
+
+                for sentence in body:
+                    wordcount={}
+                    data["threads"]+=1
+                    #clean = [word for word in sentence.split() if word.lower() not in stopwords]
+                    #print(foundKeywords)
+                    #print(timestamp,anonnick)
+                    addSentence(sentence,topics,False,timestamp,anonnick)
+                    writeToDatabase()
+                for c in o["comments"]:
+                    if c["deleted"] is True:
+                        continue
+                    sent = c["body"]
+                    #if (search_keywords(s,keywords)==True):
+                    sent = checkSentence(sent)
+                    timestamp = getDateString(c["created_at"])
+                    anonnick = getValueIntoList(c["anonnick"])
+                    for s in sent:
+                        wordcount={}
+                        data["comments"]+=1
+                        #cleanC = [word for word in body.split() if word.lower() not in stopwords]
+                        #print(timestamp2,anonnick2)
+                        addSentence(s,topics,True,timestamp,anonnick)
+                        writeToDatabase()
         except ValueError:
             print("ValueError")
             continue
         except ijson.common.IncompleteJSONError:
             print("IncompleteJSONError")
             continue
-    writeToDatabase()
+
+
+    #writeToDatabase()
     #writeToFile()
 
 #pprint(data)
+print("Threads: %s,Comments: %s\n" %(data["threads"],data["comments"]))

@@ -33,6 +33,7 @@ friend_list =["friends",
               
 """ list for money related keywords and queries """
 money_list =["money",
+            "friends",
              "price",
              "dollars",
              "euros",
@@ -59,15 +60,19 @@ staged_list = {}
 # Get and populate results
 for line in f.readlines():
     tweet_data = json.loads(line)
-        
+    repeated=0
+    # print("----------------------------------------------")
     # Topic - Bar 
     try:
         all_topic = tweet_data['topic']
         hyponyms = tweet_data['hyponyms']
-
+        
         # TODO: Check and add hyponyms 
+        print(all_topic)
 
         if any(word in all_topic for word in family_list):
+            repeated=+1
+            # print('listed')
             if ('family' in staged_list):
                 ## increment that topic
                 staged_list['family'] += 1
@@ -77,6 +82,8 @@ for line in f.readlines():
                 staged_list['family'] = 1
 
         if any(word in all_topic for word in friend_list):
+            repeated=+1
+            # print('listed')
             if ('friend' in staged_list):
                 ## increment that topic
                 staged_list['friend'] += 1
@@ -85,6 +92,8 @@ for line in f.readlines():
                 staged_list['friend'] = 1
 
         if any(word in all_topic for word in money_list):
+            repeated=+1
+            # print('listed')
             if ('money' in staged_list):
                 ## increment that topic
                 staged_list['money'] += 1
@@ -93,13 +102,17 @@ for line in f.readlines():
                 staged_list['money'] = 1
             
         if any(word in all_topic for word in treatment_list):
+            repeated=+1
+            # print('listed')
             if ('treatment' in staged_list):
                 ## increment that topic
                 staged_list['treatment'] += 1
             else:
                 ## add topic to list
                 staged_list['treatment'] = 1   
-    
+        
+        if(repeated>1):
+            print(repeated)
     except:
         print("didn't translate this one - topic")
 

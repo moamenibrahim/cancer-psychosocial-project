@@ -135,15 +135,12 @@ def analyze_file(fileName, tweet_count):
             #     processing.finnishParse(u"%s"%str(pure_text), tweet_count)
           
             translated = processing.get_translate(u"%s"%str(pure_text), tweet_data['lang'])
-            print(translated)
+            # print(translated)
+            print(tweet_count)
+            
             if translated:
                 pos = []
-<<<<<<< HEAD
                 sentences = processing.segmentation(u"%s"%str(translated))
-=======
-                Named_count=0
-                sentences = processing.segmentation(translated)
->>>>>>> 9f7ea3ff840a8dbc39bcc4a2b5d3c99da42ebfdd
                 for sentence in sentences:
                     pos.append(processing.get_pos(u"%s"%str(translated)))
                 dict_result = processing.check_dictionary(u"%s"%str(translated))
@@ -169,7 +166,7 @@ def analyze_file(fileName, tweet_count):
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
                         'links': links}
             
-            json.dumps(data, f, ensure_ascii=False)
+            json.dump(data, f, ensure_ascii=True)
             # f.write(u"%s"%str(data))
             # print(data)
             f.write(' \n')

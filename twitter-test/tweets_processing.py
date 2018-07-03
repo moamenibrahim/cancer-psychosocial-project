@@ -223,20 +223,10 @@ class functions(object):
         
         try:
             topic = self.lda.generate_topic(input_str)
-            if any(word in topic for word in family_list):
-                print("family related tweet: extracting emotions")
-                
-            
-            if any(word in topic for word in friend_list):
-                print("friend related tweet: extracting emotions")
-
-            if any(word in topic for word in money_list):
-                print("money related tweet")
-
             return topic
 
         except:
-            print("Error getting topic")
+            print("Failed to get topic")
             return False
 
 

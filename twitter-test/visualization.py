@@ -139,11 +139,9 @@ staged_lang = sorted(staged_lang.items(),
                       key=operator.itemgetter(1), reverse=True)
 staged_named_count = sorted(staged_named_count.items(),
                       key=operator.itemgetter(1), reverse=True)
-<<<<<<< HEAD
-=======
 
-print(staged_named_count)
->>>>>>> 9f7ea3ff840a8dbc39bcc4a2b5d3c99da42ebfdd
+
+# print(staged_named_count)
 
 # Visualize Results     
 x_axis=[]

@@ -1,4 +1,4 @@
-import json
+import json,nltk
 from tweets_processing import functions
 
 """ A list contains the query words to search for """
@@ -230,7 +230,7 @@ def analyze_file(fileName, tweet_count):
         else:
             tweet = tweet_data['text']
 
-        if any(word.lower() in tweet for word in mylist):
+        if any(word.lower() in tweet for word in mylist or stemmer.stem(word) in tweet for word in mylist):
             
             tweet_count = tweet_count + 1
             
@@ -243,7 +243,7 @@ def analyze_file(fileName, tweet_count):
             if translated:
                 tweet = u"%s"%str(translated)
             
-            if any(word.lower() in tweet for word in stomach):
+            if any(word.lower() in tweet for word in stomach or stemmer.stem(word) in tweet for word in stomach):
         
                 if ('stomach' in staged_list):
                     ## increment that topic
@@ -252,7 +252,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['stomach'] = 1   
 
-            if any(word.lower() in tweet for word in breast):
+            if any(word.lower() in tweet for word in breast or stemmer.stem(word) in tweet for word in breast):
     
                 if ('breast' in staged_list):
                     ## increment that topic
@@ -261,7 +261,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['breast'] = 1   
 
-            if any(word.lower() in tweet for word in blood):
+            if any(word.lower() in tweet for word in blood or stemmer.stem(word) in tweet for word in blood):
         
                 if ('blood' in staged_list):
                     ## increment that topic
@@ -270,7 +270,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['blood'] = 1   
 
-            if any(word.lower() in tweet for word in lung):
+            if any(word.lower() in tweet for word in lung or stemmer.stem(word) in tweet for word in lung):
     
                 if ('lung' in staged_list):
                     ## increment that topic
@@ -279,7 +279,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['lung'] = 1   
 
-            if any(word.lower() in tweet for word in skin):
+            if any(word.lower() in tweet for word in skin or stemmer.stem(word) in tweet for word in skin):
     
                 if ('skin' in staged_list):
                     ## increment that topic
@@ -288,7 +288,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['skin'] = 1   
 
-            if any(word.lower() in tweet for word in head_neck):
+            if any(word.lower() in tweet for word in head_neck or stemmer.stem(word) in tweet for word in head_neck):
     
                 if ('head_neck' in staged_list):
                     ## increment that topic
@@ -297,7 +297,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['head_neck'] = 1   
 
-            if any(word.lower() in tweet for word in brain):
+            if any(word.lower() in tweet for word in brain or stemmer.stem(word) in tweet for word in brain):
     
                 if ('brain' in staged_list):
                     ## increment that topic
@@ -306,7 +306,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['brain'] = 1   
             
-            if any(word.lower() in tweet for word in bone):
+            if any(word.lower() in tweet for word in bone  or stemmer.stem(word) in tweet for word in bone):
     
                 if ('bone' in staged_list):
                     ## increment that topic
@@ -315,7 +315,7 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['bone'] = 1   
             
-            if any(word.lower() in tweet for word in pediatric):
+            if any(word.lower() in tweet for word in pediatric or stemmer.stem(word) in tweet for word in pediatric):
     
                 if ('pediatric' in staged_list):
                     ## increment that topic
@@ -324,17 +324,16 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['pediatric'] = 1   
             
- 
     return int(tweet_count)
 
 if __name__ == "__main__":
 
     processing = functions()
+    stemmer = nltk.stem.PorterStemmer()
     f = open("cancerType_results.json", "w+")
     tweet_count = 0
     for x in range(3,30):
         fread = open("outputDir/2018-03-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
     json.dump(staged_list, f)
-    f.write(' \n')
     f.close()

@@ -56,7 +56,8 @@ if len(account_list) > 0:
         tweet_count = 0
         end_date = datetime.utcnow() - timedelta(days=3000)
         for status in Cursor(auth_api.user_timeline, id=target).items():
-            printRoutine (status._json['text'])
+            # printRoutine (status._json['text'])
+            printRoutine(status._json)
             tweet_count += 1
             if hasattr(status, "entities"):
                 entities = status.entities

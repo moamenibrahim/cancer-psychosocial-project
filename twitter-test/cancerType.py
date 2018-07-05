@@ -107,7 +107,13 @@ mylist = [  "cancer",
         "wilms tumor",
         "osteosarcoma",
         "retinoblastoma",
-        "pediatric"
+        "pediatric",
+        "XRCC1",
+        "EGFR",
+        "KRas",
+        "P53",
+        "BRCA1",
+        "benign"
             ]
 
 
@@ -132,7 +138,8 @@ breast=[
     "Carcinoma",
     "breast adenocarcinoma",
     "Carcinoma in situ",
-    "Sarcoma"
+    "Sarcoma",
+    "BRCA1"
 ]
 
 lung=[
@@ -239,7 +246,8 @@ def analyze_file(fileName, tweet_count):
             pure_text = processing.strip_all_entities(no_links_text)
             # print(u"%s"%str(pure_text))
             translated = processing.get_translate(u"%s"%str(pure_text), tweet_data['lang'])
-            print(translated)
+            print(tweet_count)
+            
             if translated:
                 tweet = u"%s"%str(translated)
             

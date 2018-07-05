@@ -1,4 +1,4 @@
-import json,re
+import json,re,nltk
 from tweets_processing import functions
 
 """ A list contains the query words to search for """
@@ -120,7 +120,7 @@ def analyze_file(fileName, tweet_count):
         else:
             tweet = tweet_data['text']
 
-        if any(word in tweet for word in mylist):
+        if any(word.lower() in tweet for word in mylist or stemmer.stem(word) in tweet for word in mylist):
             tweet_count = tweet_count + 1
 
             # result = processing.remove_stopWords(tweet)
@@ -135,9 +135,8 @@ def analyze_file(fileName, tweet_count):
             #     processing.finnishParse(u"%s"%str(pure_text), tweet_count)
           
             translated = processing.get_translate(u"%s"%str(pure_text), tweet_data['lang'])
-            # print(translated)
             print(tweet_count)
-            
+
             if translated:
                 pos = []
                 sentences = processing.segmentation(u"%s"%str(translated))
@@ -176,6 +175,7 @@ def analyze_file(fileName, tweet_count):
 if __name__ == "__main__":
 
     processing = functions()
+    stemmer = nltk.stem.PorterStemmer()
     f = open("stream_results.json", "w+")
     tweet_count = 0
     for x in range(3,30):

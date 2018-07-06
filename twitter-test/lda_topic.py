@@ -40,6 +40,19 @@ class lda_modeling(object):
 		output = ldamodel.print_topics(10)
 		# print (output)
 
+	# def train_lda(corpus, total_topics=2):
+		
+	# 	norm_tokenized_corpus = normalize_corpus(corpus, tokenize=True)
+	# 	dictionary = corpora.Dictionary(norm_tokenized_corpus)
+	# 	mapped_corpus = [dictionary.doc2bow(text) 
+	# 					for text in norm_tokenized_corpus]
+	# 	tfidf = models.TfidfModel(mapped_corpus)
+	# 	corpus_tfidf = tfidf[mapped_corpus]
+	# 	self.lda = models.LdaModel(corpus_tfidf, 
+	# 						id2word=dictionary,
+	# 						iterations=1000,
+	# 						num_topics=total_topics)
+	# 	return
 
 	def preprocess_sentences(self, doc_complete):
 		stop = set(stopwords.words('english'))
@@ -53,6 +66,7 @@ class lda_modeling(object):
 		return norm
 
 	def generate_topic(self, input):
+		mylist=[]
 		texts = self.preprocess_sentences(input)
 		dictionary = corpora.Dictionary(texts)
 		doc_term_matrix = [dictionary.doc2bow(text) for text in texts]
@@ -62,6 +76,7 @@ class lda_modeling(object):
 		s = tuple(str)
 		t = "\n".join(item[1] for item in s)
 		result = re.findall('[a-zA-Z]+',t)
-		# print('topics from user input', result)
-
-		return result
+		for i in result:
+			if i not in mylist:
+				mylist.append(i)
+		return mylist

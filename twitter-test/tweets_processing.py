@@ -188,11 +188,20 @@ class functions(object):
         punc_free = ' '.join(ch for ch in filtered_sentence if ch not in exclude)
         return filtered_sentence
 
+    def call_train_lda(self, location):
+        """
+        Train Topic extraction from text using LDA (Latent Dirichet Allocation): 
+        """
+        try:
+            self.lda.train_lda(location)
+        except:
+            print("Failed to train topic classifier")
 
     def get_topic(self, input_str):
-        """ Topic extraction from text using LDA (Latent Dirichet Allocation): 
-        It classifies the text according to whether it is family, friend, money related"""
-        
+        """ 
+        Topic extraction from text using LDA (Latent Dirichet Allocation): 
+        It classifies the text according to whether it is family, friend, money related
+        """
         try:
             topic = self.lda.generate_topic(input_str)
             return topic

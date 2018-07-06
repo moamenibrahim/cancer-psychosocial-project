@@ -105,7 +105,13 @@ mylist = [  "cancer",
         "wilms tumor",
         "osteosarcoma",
         "retinoblastoma",
-        "pediatric"]
+        "pediatric",
+        "XRCC1",
+        "EGFR",
+        "KRas",
+        "P53",
+        "BRCA1",
+        "benign"]
 
 
 def analyze_file(fileName, tweet_count):

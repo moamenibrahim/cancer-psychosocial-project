@@ -37,34 +37,6 @@ config = {
     "serviceAccount": "../../cancerDashboard/key.json"
 } 
 
-""" list for family related keywords and queries """
-family_list = [ "family",
-                "sad",
-                "love",
-                "hate",
-                "father",
-                "son",
-                "daughter",
-                "mother",
-                "boyfriend",
-                "girlfriend",
-                "spouse",
-                "husband",
-                "wife"]
-
-""" list for friend related keywords and queries """
-friend_list =["friends",
-              "friendship",
-              "relation"]
-              
-""" list for money related keywords and queries """
-money_list =["money",
-             "price",
-             "dollars",
-             "euros"]
-
-
-
 class functions(object):
     def __init__(self):
         

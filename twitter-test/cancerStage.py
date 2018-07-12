@@ -1,4 +1,4 @@
-import json,nltk
+import json,nltk,re
 from tweets_processing import functions
 
 """ A list contains the query words to search for """
@@ -65,15 +65,24 @@ mylist = [  "cancer",
         "stomach adenocarcinoma",
         "lymphoma",
         "carcinoid",
-        "Carcinoma",
+        "carcinoma",
         "breast adenocarcinoma",
-        "Carcinoma in situ",
-        "Sarcoma",
+        "carcinoma in situ",
+        "sarcoma",
         "SCLC",
         "NSCLC",
-        "Squamous cell carcinomas",
-        "Large cell carcinomas",
-        "Bronchial carcinoids",
+        "ductal",
+        "medullary",
+        "phyllodes",
+        "angiosarcoma",
+        "mucinous",
+        "colloid",
+        "nipple termed Paget",
+        "lobular",
+        "LCIS",
+        "squamous cell carcinomas",
+        "large cell carcinomas",
+        "bronchial carcinoids",
         "lymphoma",
         "melanoma",
         "basal",
@@ -84,10 +93,11 @@ mylist = [  "cancer",
         "pharynx",
         "larynx",
         "neoplasm",
-        "Acoustic Neuroma",
-        "Astrocytoma",
+        "acoustic Neuroma",
+        "astrocytoma",
         "chordoma",
-        "cNS Lymphoma",
+        "CNS Lymphoma",
+        "fibrocystic",
         "craniopharyngioma",
         "medulloblastoma",
         "meningioma",
@@ -113,7 +123,8 @@ mylist = [  "cancer",
         "KRas",
         "P53",
         "BRCA1",
-        "benign"]
+        "benign"
+            ]
 
 stage_0 = [
     "benign",
@@ -148,9 +159,8 @@ stage_4 = [
     "distant"
 ]
 
-TNM = []
-
 staged_list={}
+staged_TMN_list={}
 
 def analyze_file(fileName, tweet_count):
     """ Method to analyze file by file and calls all other methods """
@@ -232,6 +242,38 @@ def analyze_file(fileName, tweet_count):
                 else:
                     ## add topic to list
                     staged_list['stage_4'] = 1  
+
+
+            # TNM Match 
+            match=re.findall(r'[T]+[1-4]',tweet)
+            if match:
+                for i in match: 
+                    if (i in staged_TMN_list):
+                        ## increment that topic
+                        staged_TMN_list[i] += 1
+                    else:
+                        ## add topic to list
+                        staged_TMN_list[i] = 1  
+
+            match=re.findall(r'[N]+[1-4]',tweet)
+            if match:
+                for i in match: 
+                    if (i in staged_TMN_list):
+                        ## increment that topic
+                        staged_TMN_list[i] += 1
+                    else:
+                        ## add topic to list
+                        staged_TMN_list[i] = 1
+
+            match=re.findall(r'[M]+[1-4]',tweet)
+            if match:
+                for i in match: 
+                    if (i in staged_TMN_list):
+                        ## increment that topic
+                        staged_TMN_list[i] += 1
+                    else:
+                        ## add topic to list
+                        staged_TMN_list[i] = 1 
             
     return int(tweet_count)
 
@@ -245,4 +287,5 @@ if __name__ == "__main__":
         fread = open("outputDir/2018-03-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
     json.dump(staged_list, f)
+    json.dump(staged_TMN_list, f)
     f.close()

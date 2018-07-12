@@ -7,8 +7,8 @@ import sys
 class AlchemyNLPunderstanding(object):
   def __init__(self):
     self.natural_language_understanding = NaturalLanguageUnderstandingV1(
-        username='be696948-9d0f-475e-abfa-648a94a58378',
-        password='XtJHQCSDKMrf',
+        username='538f0686-d66e-467f-a85a-9226cde737bb',
+        password='zZuFzslKLDeC',
         version='2017-02-27')
 
   def get_response(self,text):

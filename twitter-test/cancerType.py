@@ -65,15 +65,24 @@ mylist = [  "cancer",
         "stomach adenocarcinoma",
         "lymphoma",
         "carcinoid",
-        "Carcinoma",
+        "carcinoma",
         "breast adenocarcinoma",
-        "Carcinoma in situ",
-        "Sarcoma",
+        "carcinoma in situ",
+        "sarcoma",
         "SCLC",
         "NSCLC",
-        "Squamous cell carcinomas",
-        "Large cell carcinomas",
-        "Bronchial carcinoids",
+        "ductal",
+        "medullary",
+        "phyllodes",
+        "angiosarcoma",
+        "mucinous",
+        "colloid",
+        "nipple termed Paget",
+        "lobular",
+        "LCIS",
+        "squamous cell carcinomas",
+        "large cell carcinomas",
+        "bronchial carcinoids",
         "lymphoma",
         "melanoma",
         "basal",
@@ -84,10 +93,11 @@ mylist = [  "cancer",
         "pharynx",
         "larynx",
         "neoplasm",
-        "Acoustic Neuroma",
-        "Astrocytoma",
+        "acoustic Neuroma",
+        "astrocytoma",
         "chordoma",
-        "cNS Lymphoma",
+        "CNS Lymphoma",
+        "fibrocystic",
         "craniopharyngioma",
         "medulloblastoma",
         "meningioma",
@@ -135,11 +145,20 @@ stomach=[
 breast=[
     "breast",
     "rinta",
-    "Carcinoma",
+    "carcinoma",
     "breast adenocarcinoma",
-    "Carcinoma in situ",
-    "Sarcoma",
-    "BRCA1"
+    "carcinoma in situ",
+    "sarcoma",
+    "BRCA1",
+    "ductal",
+    "medullary",
+    "phyllodes",
+    "angiosarcoma",
+    "mucinous",
+    "colloid",
+    "nipple termed Paget",
+    "lobular",
+    "LCIS"
 ]
 
 lung=[
@@ -147,9 +166,9 @@ lung=[
     "keuhko",
     "SCLC",
     "NSCLC",
-    "Squamous cell carcinomas",
-    "Large cell carcinomas",
-    "Bronchial carcinoids"
+    "squamous cell carcinomas",
+    "large cell carcinomas",
+    "bronchial carcinoids"
 ]
 
 skin=[
@@ -188,10 +207,10 @@ head_neck=[
 brain=[
     "brain",
     "aviot",
-    "Acoustic Neuroma",
-    "Astrocytoma",
+    "acoustic Neuroma",
+    "astrocytoma",
     "chordoma",
-    "cNS Lymphoma",
+    "CNS Lymphoma",
     "craniopharyngioma",
     "medulloblastoma",
     "meningioma",
@@ -226,7 +245,6 @@ pediatric=[
 
 staged_list={}
 
-all_types=stomach+lung+breast+skin+pediatric+bone+head_neck+blood
 
 def analyze_file(fileName, tweet_count):
     """ Method to analyze file by file and calls all other methods """
@@ -258,7 +276,13 @@ def analyze_file(fileName, tweet_count):
                     staged_list['stomach'] += 1
                 else:
                     ## add topic to list
-                    staged_list['stomach'] = 1   
+                    staged_list['stomach'] = 1  
+
+                # staged_list_stomach_gender 
+                
+
+                # staged_list_stomach_age
+                
 
             if any(word.lower() in tweet for word in breast or stemmer.stem(word) in tweet for word in breast):
     

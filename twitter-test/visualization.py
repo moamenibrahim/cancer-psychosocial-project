@@ -367,8 +367,6 @@ layout = go.Layout(
 )
 fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='named-count-detected-bar-2')
-<<<<<<< HEAD
-=======
 
 # # Sentiment - Bar 
 # sentiment = tweet_data['sentiment']
@@ -380,4 +378,3 @@ py.plot(fig, filename='named-count-detected-bar-2')
 #         ## add Sentiment to list
 #         staged_sentiment[sentiment] = 1
 
->>>>>>> 9f7ea3ff840a8dbc39bcc4a2b5d3c99da42ebfdd

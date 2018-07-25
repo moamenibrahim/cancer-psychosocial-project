@@ -4,14 +4,250 @@ import jsonpickle
 import json
 import os
 from tweepy import OAuthHandler
-from googletrans import Translator # for google translate
 
-translator = Translator()
+mylist = [  
+            "cancer",
+            "tumor",
+            "leukemia",
+            "neuroblastoma",
+            "paraganglioma",
+            "retinoblastoma",
+            "astrocytomas",
+            "retinoblastoma",
+            "lymphoma",
+            "melanoma",
+            "syöpä",
+            "kasvain",
+            "säteily",
+            "hoito",
+            "kuolla",
+            "malignant",  
+            "metastasis", 
+            "oncology",   
+            "oncologist",
+            "pathologist",
+            "precancerous",
+            "sarcoma",
+            "telemedicine",
+            "healthcare",
+            "chemotherapy",
+            "radiation",
+            "hormonetherapy",
+            "mammogram",
+            "kræft",
+            "kreft",
+            "carcino",
+            "lymphom",
+            "biopsy",
+            "biopsies",
+            "melano",
+            "sarcoma",
+            "dysplasia",
+            "mammogr",
+            "maligna",
+            "metasta",
+            "PET",
+            "ablate",
+            "ablation",
 
-searchQuery = 'cancer patient'  # this is what we're searching for
-maxTweets = 10000000  # Some arbitrary large number
+        ### SPECIFIC CANCER KEYWORDS
+        "osteosarcoma",
+        "ewing",
+        "fibrosarcoma",
+        "histiocytoma",
+        "chordoma",
+        "gastrointestinal",
+        "tract",
+        "colorectal",
+        "colon",
+        "lymphoma",
+        "carcinoid",
+        "carcinoma",
+        "adenocarcinoma",
+        "carcinoma",
+        "sarcoma",
+        "SCLC",
+        "NSCLC",
+        "ductal",
+        "medullary",
+        "phyllodes",
+        "angiosarcoma",
+        "mucinous",
+        "colloid",
+        "nipple",
+        "lobular",
+        "LCIS",
+        "squamous",
+        "carcinomas",
+        "carcinoids",
+        "lymphoma",
+        "melanoma",
+        "basal",
+        "dermatology",
+        "melanoma",
+        "moles",
+        "cavity",
+        "pharynx",
+        "larynx",
+        "neoplasm",
+        "neuroma",
+        "astrocytoma",
+        "chordoma",
+        "CNS",
+        "fibrocystic",
+        "craniopharyngioma",
+        "medulloblastoma",
+        "meningioma",
+        "metastatic",
+        "oligodendroglioma",
+        "pituitary",
+        "neuroectodermal",
+        "PNET",
+        "schwannoma",
+        "osteosarcoma",
+        "ewing",
+        "fibrosarcoma",
+        "histiocytoma",
+        "chordoma",
+        "neuroblastoma",
+        "wilms",
+        "osteosarcoma",
+        "retinoblastoma",
+        "pediatric",
+        "XRCC1",
+        "EGFR",
+        "KRas",
+        "P53",
+        "BRCA1",
+        "benign"
+            ]
+
+
+## From: https://www.cancer.gov/types
+stomach=[
+    "stomach",
+    "vatsa",
+    "gastric",
+    "digestive",
+    "gastrointestinal",
+    "tract",
+    "colorectal",
+    "colon",
+    "adenocarcinoma",
+    "lymphoma",
+    "carcinoid"
+]
+
+breast=[
+    "breast",
+    "breastcancer",
+    "tits",
+    "boobs"
+    "rinta",
+    "carcinoma",
+    "adenocarcinoma",
+    "carcinoma",
+    "situ",
+    "sarcoma",
+    "BRCA1",
+    "ductal",
+    "medullary",
+    "phyllodes",
+    "angiosarcoma",
+    "mucinous",
+    "colloid",
+    "lobular",
+    "LCIS",
+    "nipple",
+    "nipples"
+]
+
+lung=[
+    "lung",
+    "keuhko",
+    "SCLC",
+    "NSCLC",
+    "squamous",
+    "carcinomas",
+    "bronchial"
+]
+
+skin=[
+    "skin",
+    "iho",
+    "lymphoma",
+    "melanoma",
+    "basal",
+    "dermatology",
+    "melanoma",
+    "moles"
+]
+
+blood=[
+    "leukemia",
+    "veri",
+    "leucocythaemia",
+    "leucocythaemias",
+    "leucocythemia",
+    "leucocythemia",
+    "hematologic",
+    "blood"
+]
+
+head_neck=[
+    "pään",
+    "kaulan",
+    "head",
+    "neck",
+    "pharynx",
+    "larynx"
+]
+
+brain=[
+    "brain",
+    "aviot",
+    "astrocytoma",
+    "chordoma",
+    "CNS",
+    "craniopharyngioma",
+    "medulloblastoma",
+    "meningioma",
+    "metastatic",
+    "oligodendroglioma",
+    "pituitary",
+    "Neuroectodermal",
+    "PNET",
+    "schwannoma"
+]
+
+bone=[
+    "bone",
+    "luu",
+    "osteosarcoma",
+    "ewing",
+    "fibrosarcoma",
+    "histiocytoma",
+    "chordoma"
+]
+
+pediatric=[
+    "pediatric",
+    "childhood",
+    "child",
+    "kid",
+    "neuroblastoma",
+    "wilms",
+    "osteosarcoma",
+    "retinoblastoma"]
+
+
+maxTweets = 100000000  # Some arbitrary large number
 tweetsPerQry = 100  # this is the max the API permits
-fName = 'tweets.json'  # We'll store the tweets in a text file.
+
+searchQuery = ' OR '.join(str(e) for e in lung)
+print(searchQuery)
+
+fName = 'lung_tweets.json'  # We'll store the tweets in a text file.
 
 # If results only below a specific ID are, set max_id to that ID.
 # else default to no upper limit, 
@@ -62,7 +298,7 @@ with open(fName, 'w') as f:
             for tweet in new_tweets:
                 if tweet._json['user']['location'] != "":
                 # if  any(tweet._json['user']['location'] in s for s in str_lst) :
-                #if ('Finland' in (tweet._json['user']['location'])):
+                # if ('Finland' in (tweet._json['user']['location'])):
                     f.write(jsonpickle.encode(
                         tweet._json, unpicklable=False)+'\n')
                 

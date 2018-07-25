@@ -6,55 +6,15 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly
 import operator
+from keywords_helper import Categorization_keywords
 
 plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
 
 f = open("stream_results.json", "r")
 
-
-""" list for family related keywords and queries """
-family_list = [ "family",
-                "father",
-                "son",
-                "daughter",
-                "mother",
-                "boyfriend",
-                "girlfriend",
-                "spouse",
-                "husband",
-                "wife"]
-
-""" list for friend related keywords and queries """
-friend_list =["friends",
-              "friendship",
-              "relation",
-              "school"]
-              
-""" list for money related keywords and queries """
-money_list =["money",
-            "friends",
-             "price",
-             "dollars",
-             "euros",
-             "saving",
-             "savings"
-             ,"cost"]
-
-""" list for treatment related keywords and queries """
-treatment_list =["treatment",
-             "radiotherapy",
-             "surgical",
-             "surgery",
-             "pharma",
-             "chemotherapy",
-             "diagnosis"]
-
-
-
 staged_hyponyms = {}
 staged_topic = {}
-
 staged_list = {}
 
 # Get and populate results

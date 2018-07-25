@@ -24,6 +24,8 @@ from os.path import expanduser
 from nltk.tag import StanfordNERTagger
 sys.path.insert(0, '../IBM')
 from ibmNLPunderstanding import AlchemyNLPunderstanding
+from nameparser.parser import HumanName
+
 
 
 """ Configuration for the firbase database settings """ 
@@ -352,3 +354,29 @@ class functions(object):
             else:
                 not_in_dict +=1 
         return in_dict/(in_dict+not_in_dict)
+
+    def get_human_names(text):
+        tokens = nltk.tokenize.word_tokenize(text)
+        pos = nltk.pos_tag(tokens)
+        sentt = nltk.ne_chunk(pos, binary = False)
+        person_list = []
+        person = []
+        name = ""
+        for subtree in sentt.subtrees(filter=lambda t: t.node == 'PERSON'):
+            for leaf in subtree.leaves():
+                person.append(leaf[0])
+            if len(person) > 1: #avoid grabbing lone surnames
+                for part in person:
+                    name += part + ' '
+                if name[:-1] not in person_list:
+                    person_list.append(name[:-1])
+                name = ''
+            person = []
+
+        return (person_list)
+
+        # for sent in nltk.sent_tokenize(text):
+        #     tokens = nltk.tokenize.word_tokenize(sent)
+        #     tags = st.tag(tokens)
+        #     for tag in tags:
+        #         if tag[1]=='PERSON': print tag

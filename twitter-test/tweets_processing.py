@@ -105,7 +105,6 @@ class functions(object):
         part of speech tagging extraction
         """
         staged_rows = {}
-
         staged_nouns = {}
         staged_verbs = {}
         staged_determiner = {}
@@ -145,7 +144,6 @@ class functions(object):
         """ 
         hyponyms extraction and checking the topics list 
         """
-
         entities = {}
         words = tweet.split()
         for word in words:
@@ -158,15 +156,6 @@ class functions(object):
                         for lemma in hyponym.lemmas():
                             entities["Hyponyms"].append(lemma.name())
         return entities
-
-
-    def get_named_entity(self, tweet):
-        """ 
-        get named entity recognition and check if words have entry in lexical database 
-        TODO: Illinois named entity
-        """
-        pass
-
 
     def get_stanford_named_entity(self, tweet):
         """ 
@@ -183,7 +172,6 @@ class functions(object):
     def remove_stopWords(self, tweet):
         """ Removing english stop words from the text sent 
         including punctuations """
-
         exclude = set(string.punctuation)
         word_tokens = word_tokenize(tweet)
         filtered_sentence = [w for w in word_tokens if not w in self.stop_words]
@@ -215,7 +203,6 @@ class functions(object):
 
     def get_translate(self, input_str, lang):
         """ using googletrans to translate text from any language to English """
-
         if(lang!='und'):
             try:
                 translated=self.translator.translate(input_str, dest='en', src=lang)
@@ -228,20 +215,17 @@ class functions(object):
     # def get_Geniapos(self, tweet):
     #     """ Genia Tagger part of speech tagging extraction
     #     Medical part of speech tagger """
-
     #     out = self.tagger.parse(tweet)
     #     return out
 
 
     def get_sentiment(self, input_str):
         """ Get sentiment analysis when needed, the used API is IBM watson's """
-
         return self.NLP_understanding.get_response(input_str)
 
 
     def extract_link(self, text):
         """ Extracting links from tweets or text """
-
         regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
         match = re.search(regex, text)
         if match:
@@ -252,7 +236,6 @@ class functions(object):
     def guess_type_of(self, link, strict=True):
         """ Determine the link info and know whether it can be helpful for
         the study or no """
-
         link_type, _ = mimetypes.guess_type(link)
         print(link_type)
 
@@ -268,10 +251,9 @@ class functions(object):
     def databasePush(self, tweet_count, tweet_data):
         """ A method to send tweets without processed data 
         to the database on firebase """
-
         self.db.child("Twitter").child("tweet"+str(tweet_count))
         self.db.set(tweet_data)
-        pass
+        return
 
 
     ''' Finnish functions part '''
@@ -372,11 +354,13 @@ class functions(object):
                     person_list.append(name[:-1])
                 name = ''
             person = []
-
         return (person_list)
 
-        # for sent in nltk.sent_tokenize(text):
-        #     tokens = nltk.tokenize.word_tokenize(sent)
-        #     tags = st.tag(tokens)
-        #     for tag in tags:
-        #         if tag[1]=='PERSON': print tag
+    def RateSentiment(sentiString):
+        #open a subprocess using shlex to get the command line string into the correct args list format
+        p = subprocess.Popen(shlex.split("java -jar ../../cancer/SentiStrength.jar stdin explain sentidata ../../cancer/SentiStrength_Data/"),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        #communicate via stdin the string to be rated. Note that all spaces are replaced with +
+        stdout_text, stderr_text = p.communicate(sentiString.replace(" ","+").encode("utf-8"))
+        #remove the tab spacing between the positive and negative ratings. e.g. 1    -5 -> 1-5
+        stdout_text = stdout_text.decode("utf-8").rstrip().replace("\t","")
+        return stdout_text[0],stdout_text[1:3]

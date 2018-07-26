@@ -3,7 +3,7 @@ from tweepy import API
 from tweepy import Cursor
 from datetime import datetime, date, time, timedelta
 from collections import Counter
-import sys
+import sys,json
 
 consumer_key = 'zgwY6GgJ2p6kCX39X17zm4UpK'
 consumer_secret = 'Kv9AazgJmYueIQPmY5kO1MhUsZvDiXaHJZw03fVe9p8H5AipPv'
@@ -18,7 +18,9 @@ f = open("get_user.json", "w+")
 
 def printRoutine(inputTxt):
     """ Method to print in a file and on screen for debugging purposes """
-    f.write(str(inputTxt)+'\n')
+    # f.write(str(inputTxt)+'\n')
+    json.dump(inputTxt,f)
+    f.write(' \n')
 
 # account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
 account_list = [53292926]
@@ -56,8 +58,6 @@ if len(account_list) > 0:
         tweet_count = 0
         end_date = datetime.utcnow() - timedelta(days=3000)
         for status in Cursor(auth_api.user_timeline, id=target).items():
-            # printRoutine (status._json['text'])
-            printRoutine(status._json)
             tweet_count += 1
             if hasattr(status, "entities"):
                 entities = status.entities
@@ -75,6 +75,7 @@ if len(account_list) > 0:
                                 name = ent["screen_name"]
                             if name is not None:
                                 mentions.append(name)
+                printRoutine({ "text" : status._json['text'], "entities" : status.entities })
             if status.created_at < end_date:
                 # break
                 pass

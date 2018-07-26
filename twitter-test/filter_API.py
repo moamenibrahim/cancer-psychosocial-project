@@ -1,6 +1,6 @@
 import json,nltk
 from tweets_processing import functions
-from keywords_helper import cancer_keywords
+from keywords_helper import cancer_keywords as cancer
 
 staged_list={}
 
@@ -16,7 +16,7 @@ def analyze_file(fileName, tweet_count):
             else:
                 tweet = tweet_data['full_text']
 
-            if any(word.lower() in tweet for word in mylist or stemmer.stem(word) in tweet for word in mylist):
+            if any(word.lower() in tweet for word in cancer.mylist or stemmer.stem(word) in tweet for word in cancer.mylist):
                 
                 tweet_count = tweet_count + 1
                 print(tweet_count)   

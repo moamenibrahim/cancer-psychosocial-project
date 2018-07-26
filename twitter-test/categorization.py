@@ -6,7 +6,7 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly
 import operator
-from keywords_helper import Categorization_keywords
+from keywords_helper import Categorization_keywords as category
 
 plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
@@ -30,7 +30,7 @@ for line in f.readlines():
         # TODO: Check and add hyponyms 
         print(all_topic)
 
-        if any(word in all_topic for word in family_list):
+        if any(word in all_topic for word in category.family_list):
             repeated=+1
             # print('listed')
             if ('family' in staged_list):
@@ -41,7 +41,7 @@ for line in f.readlines():
                 # staged_list.add('family')
                 staged_list['family'] = 1
 
-        if any(word in all_topic for word in friend_list):
+        if any(word in all_topic for word in category.friend_list):
             repeated=+1
             # print('listed')
             if ('friend' in staged_list):
@@ -51,7 +51,7 @@ for line in f.readlines():
                 ## add topic to list
                 staged_list['friend'] = 1
 
-        if any(word in all_topic for word in money_list):
+        if any(word in all_topic for word in category.money_list):
             repeated=+1
             # print('listed')
             if ('money' in staged_list):
@@ -61,7 +61,7 @@ for line in f.readlines():
                 ## add topic to list
                 staged_list['money'] = 1
             
-        if any(word in all_topic for word in treatment_list):
+        if any(word in all_topic for word in category.treatment_list):
             repeated=+1
             # print('listed')
             if ('treatment' in staged_list):

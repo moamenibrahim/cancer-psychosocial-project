@@ -1,6 +1,6 @@
 import json,re,nltk
 from tweets_processing import functions
-from keywords_helper import cancer_keywords
+from keywords_helper import cancer_keywords as cancer
 
 def analyze_file(fileName, tweet_count):
     """ Method to analyze file by file and calls all other methods """
@@ -14,7 +14,10 @@ def analyze_file(fileName, tweet_count):
         else:
             tweet = tweet_data['text']
 
-        if any(word.lower() in tweet for word in mylist or stemmer.stem(word) in tweet for word in mylist):
+        if any(word.lower() in tweet for word in cancer.mylist 
+            or stemmer.stem(word) in tweet for word in cancer.mylist
+            or word in hastags for word in cancer.mylist
+            ):
             tweet_count = tweet_count + 1
 
             # result = processing.remove_stopWords(tweet)
@@ -45,15 +48,20 @@ def analyze_file(fileName, tweet_count):
                                 or (bool(re.search('DATE',str(i))))):
                         Named_count+=1
                 topic = processing.get_topic(u"%s"%str(translated))
-                sentiment = processing.get_sentiment(u"%s"%str(translated))
-                                
+                # sentiment = processing.get_sentiment(u"%s"%str(translated))
+                sentiment = processing.RateSentiment(u"%s"%str(translated))
+                names = processing.get_human_names(u"%s"%str(translated))
+
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
                         'links': links, 'translation': u"%s"%str(translated), 'pos': u"%s"%str(pos),
                         'hyponyms': u"%s"%str(hyponyms), 'named entity': u"%s"%str(named),
                         'topic': topic, 'sentiment': u"%s"%str(sentiment), 'check_dictionary': dict_result,
-                        'Named count': Named_count}
-                
+                        'Named count': Named_count,
+                        'names':names}
+
+                processing.databasePush(tweet_count,data)
+
             else:
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),

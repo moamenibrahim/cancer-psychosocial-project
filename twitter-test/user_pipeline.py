@@ -30,8 +30,9 @@ def analyze_file(fileName, tweet_count):
                             or (bool(re.search('DATE',str(i))))):
                     Named_count+=1
             topic = processing.get_topic(pure_text)
-            sentiment = processing.get_sentiment(pure_text)
-                                
+            # sentiment = processing.get_sentiment(pure_text)
+            sentiment = processing.RateSentiment(pure_text)
+
             data = {'tweet': tweet_count,
                     'tweet length': len(tweet.split()),
                     'links': links, 'pure_text': pure_text, 'pos': pos,

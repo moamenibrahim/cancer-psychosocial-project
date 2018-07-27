@@ -14,43 +14,46 @@ def analyze_file(fileName, tweet_count):
         else:
             tweet = tweet_data['text']
 
-        if any(word.lower() in tweet for word in cancer.mylist 
-            or stemmer.stem(word) in tweet for word in cancer.mylist
-            or word in hastags for word in cancer.mylist
-            ):
-            tweet_count = tweet_count + 1
+        hastags = processing.get_hashtags(tweet)
 
-            # result = processing.remove_stopWords(tweet)
-            # databasePush(tweet_count, tweet_data)
-            
-            hastags = processing.get_hashtags(tweet)
+        if (any(word.lower() in tweet for word in cancer.mylist)
+            or any(stemmer.stem(word) in tweet for word in cancer.mylist)
+            or any(word in hastags for word in cancer.mylist)
+            ):
+
+            html = 'None'
+            tweet_count = tweet_count + 1
+            print(tweet_count)
+
             no_links_text, links = processing.strip_links(tweet)
-            # guess_type_of(links)
+            if links:
+                html = processing.guess_type_of(links)
             pure_text = processing.strip_all_entities(no_links_text)
 
             # if tweet_data['lang'] == 'fi':
             #     processing.finnishParse(u"%s"%str(pure_text), tweet_count)
           
             translated = processing.get_translate(u"%s"%str(pure_text), tweet_data['lang'])
-            print(tweet_count)
-
             if translated:
+                dict_result = processing.check_dictionary(u"%s"%str(translated))
                 pos = []
                 sentences = processing.segmentation(u"%s"%str(translated))
                 for sentence in sentences:
                     pos.append(processing.get_pos(u"%s"%str(translated)))
-                dict_result = processing.check_dictionary(u"%s"%str(translated))
                 hyponyms = processing.get_hyponyms(u"%s"%str(translated))
+                names = processing.get_human_names(u"%s"%str(translated))
                 named = processing.get_stanford_named_entity(u"%s"%str(translated))
+                
                 for i in named:
                     if ((bool( ((bool(re.search('TIME',str(i)))) or bool(re.search('LOCATION',str(i)))) or re.search('ORGANIZATION',str(i))))
                                 or (bool(re.search('PERSON',str(i)))) or (bool(re.search('MONEY',str(i))))
                                 or (bool(re.search('DATE',str(i))))):
                         Named_count+=1
+                
+                translated = processing.remove_stopWords(u"%s"%str(translated))
                 topic = processing.get_topic(u"%s"%str(translated))
                 # sentiment = processing.get_sentiment(u"%s"%str(translated))
                 sentiment = processing.RateSentiment(u"%s"%str(translated))
-                names = processing.get_human_names(u"%s"%str(translated))
 
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
@@ -58,15 +61,18 @@ def analyze_file(fileName, tweet_count):
                         'hyponyms': u"%s"%str(hyponyms), 'named entity': u"%s"%str(named),
                         'topic': topic, 'sentiment': u"%s"%str(sentiment), 'check_dictionary': dict_result,
                         'Named count': Named_count,
-                        'names':names}
+                        'names':names,
+                        'html':html,
+                        'pure_text':pure_text}
 
-                processing.databasePush(tweet_count,data)
 
             else:
+
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
-                        'links': links}
-            
+                        'html':html,'links': links}
+                            
+            processing.databasePush(tweet_count,data)
             json.dump(data, f, ensure_ascii=True)
             # f.write(u"%s"%str(data))
             # print(data)
@@ -82,5 +88,13 @@ if __name__ == "__main__":
     tweet_count = 0
     for x in range(3,30):
         fread = open("outputDir/2018-03-"+str(x)+".json", "r")
+        tweet_count=analyze_file(fread,tweet_count)
+
+    for x in range(3,24):
+        fread = open("outputDir/2018-06-"+str(x)+".json", "r")
+        tweet_count=analyze_file(fread,tweet_count)
+
+    for x in range(9,26):
+        fread = open("outputDir/2018-07-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
     f.close()

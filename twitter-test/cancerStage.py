@@ -26,7 +26,6 @@ def analyze_file(fileName, tweet_count):
             
             no_links_text, links = processing.strip_links(tweet)
             pure_text = processing.strip_all_entities(no_links_text)
-            # print(u"%s"%str(pure_text))
             translated = processing.get_translate(u"%s"%str(pure_text), tweet_data['lang'])
             print(tweet_count)
 
@@ -131,6 +130,15 @@ if __name__ == "__main__":
     for x in range(3,30):
         fread = open("outputDir/2018-03-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
+
+    for x in range(3,24):
+        fread = open("outputDir/2018-06-"+str(x)+".json", "r")
+        tweet_count=analyze_file(fread,tweet_count)
+
+    for x in range(9,26):
+        fread = open("outputDir/2018-07-"+str(x)+".json", "r")
+        tweet_count=analyze_file(fread,tweet_count)
+
     json.dump(staged_list, f)
     json.dump(staged_TMN_list, f)
     f.close()

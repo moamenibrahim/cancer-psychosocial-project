@@ -12,6 +12,7 @@ import subprocess
 import nltk 
 import time
 import enchant
+import shlex
 from nltk.stem.wordnet import WordNetLemmatizer
 from gensim import corpora, models, similarities
 from nltk.corpus import stopwords
@@ -208,7 +209,7 @@ class functions(object):
                 translated=self.translator.translate(input_str, dest='en', src=lang)
                 return translated.text
             except:
-                print("Failed to translate text")
+                # print("Failed to translate text")
                 return False
 
 
@@ -236,16 +237,9 @@ class functions(object):
     def guess_type_of(self, link, strict=True):
         """ Determine the link info and know whether it can be helpful for
         the study or no """
-        link_type, _ = mimetypes.guess_type(link)
-        print(link_type)
-
-        with urllib.request.urlopen(link) as response:
-            html = response.read()
-            if link_type is None and strict:
-                u = urllib.request.urlopen(link)
-                link_type = html.info().gettype()  
-                # or using: u.info().gettype()
-        return html
+        # print(link[0][0])
+        link_type, _ = mimetypes.guess_type(str(link[0][0]))
+        return link_type
 
 
     def databasePush(self, tweet_count, tweet_data):
@@ -337,14 +331,14 @@ class functions(object):
                 not_in_dict +=1 
         return in_dict/(in_dict+not_in_dict)
 
-    def get_human_names(text):
+    def get_human_names(self,text):
         tokens = nltk.tokenize.word_tokenize(text)
         pos = nltk.pos_tag(tokens)
         sentt = nltk.ne_chunk(pos, binary = False)
         person_list = []
         person = []
         name = ""
-        for subtree in sentt.subtrees(filter=lambda t: t.node == 'PERSON'):
+        for subtree in sentt.subtrees(filter=lambda t: t.label() == 'PERSON'):
             for leaf in subtree.leaves():
                 person.append(leaf[0])
             if len(person) > 1: #avoid grabbing lone surnames
@@ -356,7 +350,7 @@ class functions(object):
             person = []
         return (person_list)
 
-    def RateSentiment(sentiString):
+    def RateSentiment(self,sentiString):
         #open a subprocess using shlex to get the command line string into the correct args list format
         p = subprocess.Popen(shlex.split("java -jar ../../cancer/SentiStrength.jar stdin explain sentidata ../../cancer/SentiStrength_Data/"),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         #communicate via stdin the string to be rated. Note that all spaces are replaced with +

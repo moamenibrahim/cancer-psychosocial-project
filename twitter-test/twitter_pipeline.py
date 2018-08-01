@@ -50,16 +50,16 @@ def analyze_file(fileName, tweet_count):
                                 or (bool(re.search('DATE',str(i))))):
                         Named_count+=1
                 
-                translated = processing.remove_stopWords(u"%s"%str(translated))
-                topic = processing.get_topic(u"%s"%str(translated))
-                # sentiment = processing.get_sentiment(u"%s"%str(translated))
-                sentiment = processing.RateSentiment(u"%s"%str(translated))
+                pure_translated = processing.remove_stopWords(u"%s"%str(translated))
+                topic = processing.get_topic(u"%s"%str(pure_translated))
+                # sentiment = processing.get_sentiment(u"%s"%str(pure_translated))
+                sentiment = processing.RateSentiment(u"%s"%str(pure_translated))
 
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
-                        'links': links, 'translation': u"%s"%str(translated), 'pos': u"%s"%str(pos),
-                        'hyponyms': u"%s"%str(hyponyms), 'named entity': u"%s"%str(named),
-                        'topic': topic, 'sentiment': u"%s"%str(sentiment), 'check_dictionary': dict_result,
+                        'links': links, 'translation': translated, 'pos': pos,
+                        'hyponyms': hyponyms, 'named entity': named,
+                        'topic': topic, 'sentiment': sentiment, 'check_dictionary': dict_result,
                         'Named count': Named_count,
                         'names':names,
                         'html':html,
@@ -97,4 +97,6 @@ if __name__ == "__main__":
     for x in range(9,26):
         fread = open("outputDir/2018-07-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
+
+    processing.stop_firebase()
     f.close()

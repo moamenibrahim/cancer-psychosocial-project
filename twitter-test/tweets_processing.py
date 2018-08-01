@@ -13,6 +13,7 @@ import nltk
 import time
 import enchant
 import shlex
+import threading
 from nltk.stem.wordnet import WordNetLemmatizer
 from gensim import corpora, models, similarities
 from nltk.corpus import stopwords
@@ -49,10 +50,10 @@ class functions(object):
         self.NLP_understanding = AlchemyNLPunderstanding()
         # self.tagger = geniatagger.GeniaTagger(
         #     '../../cancer/geniatagger-3.0.2/geniatagger')
-        self.firebase = pyrebase.initialize_app(config)
-        self.auth = self.firebase.auth()
-        self.db = self.firebase.database()
         self.dictionary= enchant.Dict("en_US")
+        self.th=threading.Timer(60*50, self.reauthorize_firebase)
+        self.th.start()
+        self.reauthorize_firebase()
         time.sleep(7)
 
     def segmentation(self, tweet):
@@ -249,6 +250,20 @@ class functions(object):
         self.db.set(tweet_data)
         return
 
+    def reauthorize_firebase(self):
+        """A method to re-authorize access to firebase 
+        every one hour"""
+        print("authorizing access to firebase")
+        self.firebase = pyrebase.initialize_app(config)
+        self.auth = self.firebase.auth()
+        self.db = self.firebase.database()
+        return
+
+    def stop_firebase(self):
+        """Cancelling the thread responsible for 
+        re-authorize access to firebase"""
+        self.th.cancel()
+        return
 
     ''' Finnish functions part '''
     def finnishParse(self, tweet, tweet_count):

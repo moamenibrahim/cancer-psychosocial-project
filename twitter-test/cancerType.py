@@ -40,9 +40,9 @@ def analyze_file(fileName, tweet_count):
             tweet = tweet_data['text']
         hastags = processing.get_hashtags(tweet)
 
-        if any(word.lower() in tweet for word in cancer.mylist 
-                or stemmer.stem(word) in tweet for word in cancer.mylist 
-                or word in hastags for word in cancer.mylist):   
+        if (any(word.lower() in tweet for word in cancer.mylist )
+                or any(stemmer.stem(word) in tweet for word in cancer.mylist )
+                or any(word in hastags for word in cancer.mylist)):   
 
             tweet_count = tweet_count + 1 
             no_links_text, links = processing.strip_links(tweet)
@@ -60,9 +60,9 @@ def analyze_file(fileName, tweet_count):
                 staged_gender_total.append({'tweet_count':tweet_count,'pcent':pcent,'nsents':nsents})
 
 
-            if any(word.lower() in tweet for word in cancer.stomach 
-                or stemmer.stem(word) in tweet for word in cancer.stomach
-                or word in hastags for word in cancer.stomach):
+            if (any(word.lower() in tweet for word in cancer.stomach )
+                or any(stemmer.stem(word) in tweet for word in cancer.stomach)
+                or any(word in hastags for word in cancer.stomach)):
         
                 if ('stomach' in staged_list):
                     ## increment that topic
@@ -80,9 +80,9 @@ def analyze_file(fileName, tweet_count):
                     staged_list_stomach['female'] += 1
 
                 
-            if any(word.lower() in tweet for word in cancer.breast 
-                or stemmer.stem(word) in tweet for word in cancer.breast
-                or word in hastags for word in cancer.breast):
+            if (any(word.lower() in tweet for word in cancer.breast )
+                or any(stemmer.stem(word) in tweet for word in cancer.breast)
+                or any(word in hastags for word in cancer.breast)):
     
                 if ('breast' in staged_list):
                     ## increment that topic
@@ -100,9 +100,9 @@ def analyze_file(fileName, tweet_count):
                     staged_list_breast['female'] += 1
 
 
-            if any(word.lower() in tweet for word in cancer.blood 
-                or stemmer.stem(word) in tweet for word in cancer.blood
-                or word in hastags for word in cancer.blood):
+            if (any(word.lower() in tweet for word in cancer.blood)
+                or any(stemmer.stem(word) in tweet for word in cancer.blood)
+                or any(word in hastags for word in cancer.blood)):
         
                 if ('blood' in staged_list):
                     ## increment that topic
@@ -120,9 +120,9 @@ def analyze_file(fileName, tweet_count):
                     staged_list_blood['female'] += 1  
 
 
-            if any(word.lower() in tweet for word in cancer.lung 
-                or stemmer.stem(word) in tweet for word in cancer.lung
-                or word in hastags for word in cancer.lung):
+            if (any(word.lower() in tweet for word in cancer.lung)
+                or any(stemmer.stem(word) in tweet for word in cancer.lung)
+                or any(word in hastags for word in cancer.lung)):
     
                 if ('lung' in staged_list):
                     ## increment that topic
@@ -140,9 +140,9 @@ def analyze_file(fileName, tweet_count):
                     staged_list_lung['female'] += 1  
 
 
-            if any(word.lower() in tweet for word in cancer.skin 
-                or stemmer.stem(word) in tweet for word in cancer.skin
-                or word in hastags for word in cancer.skin):
+            if (any(word.lower() in tweet for word in cancer.skin) 
+                or any(stemmer.stem(word) in tweet for word in cancer.skin)
+                or any(word in hastags for word in cancer.skin)):
     
                 if ('skin' in staged_list):
                     ## increment that topic
@@ -160,9 +160,9 @@ def analyze_file(fileName, tweet_count):
                     staged_list_skin['female'] += 1
 
 
-            if any(word.lower() in tweet for word in cancer.head_neck 
-                or stemmer.stem(word) in tweet for word in cancer.head_neck
-                or word in hastags for word in cancer.head_neck):
+            if (any(word.lower() in tweet for word in cancer.head_neck )
+                or any(stemmer.stem(word) in tweet for word in cancer.head_neck)
+                or any(word in hastags for word in cancer.head_neck)):
     
                 if ('head_neck' in staged_list):
                     ## increment that topic
@@ -179,9 +179,9 @@ def analyze_file(fileName, tweet_count):
                 else:
                     staged_list_head_neck['female'] += 1  
 
-            if any(word.lower() in tweet for word in cancer.brain 
-                or stemmer.stem(word) in tweet for word in cancer.brain
-                or word in hastags for word in cancer.brain):
+            if (any(word.lower() in tweet for word in cancer.brain) 
+                or any(stemmer.stem(word) in tweet for word in cancer.brain)
+                or any(word in hastags for word in cancer.brain)):
     
                 if ('brain' in staged_list):
                     ## increment that topic
@@ -198,9 +198,9 @@ def analyze_file(fileName, tweet_count):
                 else:
                     staged_list_brain['female'] += 1 
             
-            if any(word.lower() in tweet for word in cancer.bone  
-                or stemmer.stem(word) in tweet for word in cancer.bone
-                or word in hastags for word in cancer.bone):
+            if (any(word.lower() in tweet for word in cancer.bone)  
+                or any(stemmer.stem(word) in tweet for word in cancer.bone)
+                or any(word in hastags for word in cancer.bone)):
     
                 if ('bone' in staged_list):
                     ## increment that topic
@@ -217,9 +217,9 @@ def analyze_file(fileName, tweet_count):
                 else:
                     staged_list_bone['female'] += 1 
             
-            if any(word.lower() in tweet for word in cancer.pediatric 
-                or stemmer.stem(word) in tweet for word in cancer.pediatric
-                or word in hastags for word in cancer.pediatric):
+            if (any(word.lower() in tweet for word in cancer.pediatric )
+                or any(stemmer.stem(word) in tweet for word in cancer.pediatric)
+                or any(word in hastags for word in cancer.pediatric)):
     
                 if ('pediatric' in staged_list):
                     ## increment that topic
@@ -268,7 +268,7 @@ def detect_age(text,cancer_type):
 
     list_name='staged_age_%s'%cancer_type 
     print(list_name)
-    if any(word.lower() in text for word in age.set_13_18 or stemmer.stem(word) in text for word in age.set_13_18):
+    if (any(word.lower() in text for word in age.set_13_18) or any(stemmer.stem(word) in text for word in age.set_13_18)):
         if ('set_13_18' in eval(list_name)):
             ## increment that topic
             eval(list_name)['set_13_18'] += 1
@@ -276,7 +276,7 @@ def detect_age(text,cancer_type):
             ## add topic to list
             eval(list_name)['set_13_18'] = 1 
 
-    if any(word.lower() in text for word in age.set_19_22 or stemmer.stem(word) in text for word in age.set_19_22):
+    if (any(word.lower() in text for word in age.set_19_22) or any(stemmer.stem(word) in text for word in age.set_19_22)):
         if ('set_19_22' in eval(list_name)):
             ## increment that topic
             eval(list_name)['set_19_22'] += 1
@@ -284,7 +284,7 @@ def detect_age(text,cancer_type):
             ## add topic to list
             eval(list_name)['set_19_22'] = 1 
         
-    if any(word.lower() in text for word in age.set_23_29 or stemmer.stem(word) in text for word in age.set_23_29):
+    if (any(word.lower() in text for word in age.set_23_29) or any(stemmer.stem(word) in text for word in age.set_23_29)):
         if ('set_23_29' in eval(list_name)):
             ## increment that topic
             eval(list_name)['set_23_29'] += 1
@@ -292,7 +292,7 @@ def detect_age(text,cancer_type):
             ## add topic to list
             eval(list_name)['set_23_29'] = 1 
 
-    if any(word.lower() in text for word in age.set_30_65 or stemmer.stem(word) in text for word in age.set_30_65):
+    if (any(word.lower() in text for word in age.set_30_65) or any(stemmer.stem(word) in text for word in age.set_30_65)):
         if ('set_30_65' in eval(list_name)):
             ## increment that topic
             eval(list_name)['set_30_65'] += 1
@@ -322,6 +322,8 @@ def prepare_username(name):
     result = result.replace("|", "")
     result = result.replace("\\", "")
     result = result.replace("/", "")
+    result = result.replace("\"\"", "")
+    result = result.replace("\"", "")
     result = predict_gender(result.replace("~", ""))
     print(result)
     return result
@@ -374,4 +376,6 @@ if __name__ == "__main__":
     f.write('\n')
     
     f.write(str(staged_gender_total))
+    
+    processing.stop_firebase()
     f.close()

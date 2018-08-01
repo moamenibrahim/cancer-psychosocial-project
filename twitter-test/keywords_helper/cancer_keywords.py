@@ -29,6 +29,7 @@ mylist = [  "cancer",
             "telemedicine",
             "healthcare",
             "chemotherapy",
+            "chemo",
             "radiation",
             "hormone therapy",
             "mammogram",
@@ -84,7 +85,6 @@ mylist = [  "cancer",
         "melanoma",
         "basal",
         "dermatology",
-        "melanoma",
         "moles",
         "oral cavity",
         "pharynx",
@@ -120,7 +120,17 @@ mylist = [  "cancer",
         "KRas",
         "P53",
         "BRCA1",
-        "benign"
+        "benign",
+
+
+        ## Survivor
+        "cancer survivor",
+        "syövän selviytyjä",
+        "kanker overlevende",
+        "kræft overlevende",
+        "kreft overlevende",
+        "cancer överlevare",
+        "пострадавший от рака"
             ]
 
 ### Specific cancer types keywords

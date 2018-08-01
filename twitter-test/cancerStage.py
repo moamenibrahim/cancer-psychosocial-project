@@ -16,11 +16,11 @@ def analyze_file(fileName, tweet_count):
             tweet = tweet_data['text']
 
         hastags = processing.get_hashtags(tweet)
-        print(hastags)
+        # print(hastags)
 
-        if any(word.lower() in tweet for word in cancer.mylist 
-                or stemmer.stem(word) in tweet for word in cancer.mylist 
-                or word in hastags for word in cancer.mylist):
+        if (any(word.lower() in tweet for word in cancer.mylist)
+                or any(stemmer.stem(word) in tweet for word in cancer.mylist)
+                or any(word in hastags for word in cancer.mylist)):
             
             tweet_count = tweet_count + 1
             
@@ -32,9 +32,9 @@ def analyze_file(fileName, tweet_count):
             if translated:
                 tweet = u"%s"%str(translated)
             
-            if any(word.lower() in tweet for word in stage.stage_0 
-                    or stemmer.stem(word) in tweet for word in stage.stage_0
-                    or word in hastags for word in stage.stage_0):
+            if (any(word.lower() in tweet for word in stage.stage_0)
+                    or any(stemmer.stem(word) in tweet for word in stage.stage_0)
+                    or any(word in hastags for word in stage.stage_0)):
                 
                 if ('stage_0' in staged_list):
                         ## increment that topic
@@ -43,9 +43,9 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['stage_0'] = 1  
                 
-            if any(word.lower() in tweet for word in stage.stage_1 
-                    or stemmer.stem(word) in tweet for word in stage.stage_1
-                    or word in hastags for word in stage.stage_1):
+            if (any(word.lower() in tweet for word in stage.stage_1)
+                    or  any(stemmer.stem(word) in tweet for word in stage.stage_1)
+                    or  any(word in hastags for word in stage.stage_1)):
                 
                 if ('stage_1' in staged_list):
                         ## increment that topic
@@ -54,9 +54,9 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['stage_1'] = 1  
 
-            if any(word.lower() in tweet for word in stage.stage_2 
-                    or stemmer.stem(word) in tweet for word in stage.stage_2
-                    or word in hastags for word in stage.stage_2):
+            if (any(word.lower() in tweet for word in stage.stage_2)
+                    or  any(stemmer.stem(word) in tweet for word in stage.stage_2)
+                    or  any(word in hastags for word in stage.stage_2)):
                 
                 if ('stage_2' in staged_list):
                         ## increment that topic
@@ -65,9 +65,9 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['stage_2'] = 1  
 
-            if any(word.lower() in tweet for word in stage.stage_3 
-                    or stemmer.stem(word) in tweet for word in stage.stage_3
-                    or word in hastags for word in stage.stage_3):
+            if (any(word.lower() in tweet for word in stage.stage_3 )
+                    or  any(stemmer.stem(word) in tweet for word in stage.stage_3)
+                    or  any(word in hastags for word in stage.stage_3)):
                 
                 if ('stage_3' in staged_list):
                         ## increment that topic
@@ -76,9 +76,9 @@ def analyze_file(fileName, tweet_count):
                     ## add topic to list
                     staged_list['stage_3'] = 1  
 
-            if any(word.lower() in tweet for word in stage.stage_4 
-                    or stemmer.stem(word) in tweet for word in stage.stage_4
-                    or word in hastags for word in stage.stage_4):
+            if (any(word.lower() in tweet for word in stage.stage_4 )
+                    or  any(stemmer.stem(word) in tweet for word in stage.stage_4)
+                    or  any(word in hastags for word in stage.stage_4)):
                 
                 if ('stage_4' in staged_list):
                         ## increment that topic
@@ -141,4 +141,6 @@ if __name__ == "__main__":
 
     json.dump(staged_list, f)
     json.dump(staged_TMN_list, f)
+    
+    processing.stop_firebase()
     f.close()

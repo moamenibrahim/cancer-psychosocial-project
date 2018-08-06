@@ -1,0 +1,81 @@
+
+
+""" list for family related keywords and queries """
+family_list = [ "family",
+                "father",
+                "son",
+                "daughter",
+                "mother",
+                "boyfriend",
+                "girlfriend",
+                "spouse",
+                "husband",
+                "wife",
+                "home",
+                "house",
+                "grandpa",
+                "grandma"]
+
+""" list for friend related keywords and queries """
+friend_list =["friends",
+              "friendship",
+              "relation",
+              "relationship",
+              "bestfriend",
+              "bestie",
+              "schoolmate", 
+              "schoolfriend", 
+              "schoolfellow", 
+              "roomy", 
+              "roommate", 
+              "roomie", 
+              "flatmate", 
+              "fellow", 
+              "buddy", 
+              "acquaintance",
+              "mate",
+              "school"]
+              
+""" list for money related keywords and queries """
+money_list =["money",
+             "price",
+             "dollars",
+             "euros",
+             "saving",
+             "savings",
+             "cost",
+             "bucks",
+             "fund",
+             "bank",
+             "expensive",
+             "cheap"]
+
+""" list for treatment related keywords and queries """
+treatment_list =["treatment",
+             "radiotherapy",
+             "surgical",
+             "surgery",
+             "pharma",
+             "chemotherapy",
+             "diagnosis",
+             "care",
+             "healthcare",
+             "treat"]
+
+lifestyle_list = [ "lifestyle",
+                    "vegeterian",
+                    "kusher",
+                    "vegan",
+                    "gym",
+                    "sports",
+                    "healthy",
+                    "style",
+                    "mode",
+                    "manner",
+                    "fashion",
+                    "vanity fair",
+                    "free living",
+                    "fast lane",
+                    "modus vivendi",
+                    "life-style",
+                    "way of living"]

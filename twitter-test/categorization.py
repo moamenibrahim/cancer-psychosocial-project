@@ -1,51 +1,50 @@
 import os
 import sys
 import json
+import nltk
 import re
 import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly
 import operator
-from keywords_helper import Categorization_keywords as category
+from keywords_helper import categorization_keywords as category
+
+
+stemmer = nltk.stem.PorterStemmer()
 
 plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
 
-f = open("stream_results.json", "r")
+# f = open("stream_results.json", "r")
+f = open("user_results.json", "r")
 
-staged_hyponyms = {}
-staged_topic = {}
 staged_list = {}
+failed=0
+repeated=0
 
 # Get and populate results
 for line in f.readlines():
+
     tweet_data = json.loads(line)
-    repeated=0
-    # print("----------------------------------------------")
-    # Topic - Bar 
     try:
         all_topic = tweet_data['topic']
-        hyponyms = tweet_data['hyponyms']
-        
-        # TODO: Check and add hyponyms 
-        print(all_topic)
+        hyponyms = tweet_data['hyponyms']['Hyponyms']
 
         if (any(word in all_topic for word in category.family_list)
-            or any(stemmer.stem(word) in tweet for word in category.family_list)):
-            repeated=+1
-            # print('listed')
+            or any(stemmer.stem(word) in all_topic for word in category.family_list)
+            or any(word in hyponyms for word in category.family_list)):
+            repeated+=1
             if ('family' in staged_list):
                 ## increment that topic
                 staged_list['family'] += 1
             else:
                 ## add topic to list
-                # staged_list.add('family')
                 staged_list['family'] = 1
 
         if (any(word in all_topic for word in category.friend_list)
-            or any(stemmer.stem(word) in tweet for word in category.friend_list)):
-            repeated=+1
-            # print('listed')
+            or any(stemmer.stem(word) in all_topic for word in category.friend_list)
+            or any(word in hyponyms for word in category.friend_list)):
+            repeated+=1
             if ('friend' in staged_list):
                 ## increment that topic
                 staged_list['friend'] += 1
@@ -54,9 +53,9 @@ for line in f.readlines():
                 staged_list['friend'] = 1
 
         if (any(word in all_topic for word in category.money_list)
-            or any(stemmer.stem(word) in tweet for word in category.money_list)):
-            repeated=+1
-            # print('listed')
+            or any(stemmer.stem(word) in all_topic for word in category.money_list)
+            or any(word in hyponyms for word in category.money_list)):
+            repeated+=1
             if ('money' in staged_list):
                 ## increment that topic
                 staged_list['money'] += 1
@@ -65,9 +64,9 @@ for line in f.readlines():
                 staged_list['money'] = 1
             
         if (any(word in all_topic for word in category.treatment_list)
-            or any(stemmer.stem(word) in tweet for word in category.treatment_list)):
-            repeated=+1
-            # print('listed')
+            or any(stemmer.stem(word) in all_topic for word in category.treatment_list)
+            or any(word in hyponyms for word in category.treatment_list)):
+            repeated+=1
             if ('treatment' in staged_list):
                 ## increment that topic
                 staged_list['treatment'] += 1
@@ -76,23 +75,22 @@ for line in f.readlines():
                 staged_list['treatment'] = 1   
 
         if (any(word in all_topic for word in category.lifestyle_list)
-            or any(stemmer.stem(word) in tweet for word in category.lifestyle_list)):
-            repeated=+1
-            # print('listed')
+            or any(stemmer.stem(word) in all_topic for word in category.lifestyle_list)
+            or any(word in hyponyms for word in category.lifestyle_list)):
+            repeated+=1
             if ('lifestyle' in staged_list):
                 ## increment that topic
                 staged_list['lifestyle'] += 1
             else:
                 ## add topic to list
-                staged_list['lifestyle'] = 1   
-        
-        if(repeated>1):
-            print(repeated)
-    except:
-        print("didn't translate this one - topic")
-
+                staged_list['lifestyle'] = 1
+            
+    except Exception as KeyError:
+        failed+=1
 
 print(staged_list)
+print("failed to categorize %d"%failed)
+print("overall repetition %d"%repeated)
 
 staged_list = sorted(staged_list.items(),
                       key=operator.itemgetter(1), reverse=True)

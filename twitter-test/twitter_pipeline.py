@@ -70,7 +70,8 @@ def analyze_file(fileName, tweet_count):
 
                 data = {'tweet': tweet_count,
                         'lang': tweet_data['lang'], 'tweet length': len(tweet.split()),
-                        'html':html,'links': links}
+                        'html':html,'links': links,
+                        'pure_text':pure_text}
                             
             processing.databasePush(tweet_count,data)
             json.dump(data, f, ensure_ascii=True)

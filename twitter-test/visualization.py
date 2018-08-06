@@ -30,7 +30,6 @@ for line in f.readlines():
     try:
         # Named count - Bar 
         named_count = tweet_data['Named count']
-        print(named_count)
         if (named_count != ''):
             if (named_count in staged_named_count):
                 ## increment that named_count
@@ -38,7 +37,7 @@ for line in f.readlines():
             else:
                 ## add named_count to list
                 staged_named_count[named_count] = 1    
-    except:
+    except Exception as KeyError:
         print("didn't get this one - named count")
 
 
@@ -74,22 +73,26 @@ for line in f.readlines():
         else:
             ## add rounded to list
             staged_dict[rounded] = 1
-    except:
+    except Exception as KeyError:
         print("didn't translate this one - dictionary")
 
 
     # POS - Bar
     try:
         all_elements = tweet_data['pos']
-        for pos in all_elements:
-            if (pos[0] != ''):
-                if (pos[0] in staged_pos):
-                    ## increment that pos
-                    staged_pos[pos[0]] += 1
-                else:
-                    ## add pos to list
-                    staged_pos[pos[0]] = pos[1]
-    except:
+        for sentence in all_elements:
+            for pos in sentence:
+                if ((pos[0] != '') and (pos[0] != '.') and (pos[0] != ',') 
+                and (pos[0] != '#') and (pos[0] != ':') and (pos[0] != '\'\'') 
+                and (pos[0] != ')') and (pos[0] != '(') and (pos[0] != '\"\"') 
+                and (pos[0] != '$') and (pos[0] != '``')):
+                    if (pos[0] in staged_pos):
+                        ## increment that pos
+                        staged_pos[pos[0]] += 1
+                    else:
+                        ## add pos to list
+                        staged_pos[pos[0]] = pos[1]
+    except Exception as KeyError:
         print("didn't translate this one - pos")
 
 
@@ -106,7 +109,7 @@ for line in f.readlines():
                 else:
                     ## add topic to list
                     staged_topic[topic] = 1
-    except:
+    except Exception as KeyError:
         print("didn't get this one - topic")
 
 
@@ -121,7 +124,7 @@ for line in f.readlines():
                 else:
                     ## add named to list
                     staged_named[named[1]] = 1    
-    except:
+    except Exception as KeyError:
         print("didn't translate this one - named entity")
 
 
@@ -140,8 +143,6 @@ staged_lang = sorted(staged_lang.items(),
 staged_named_count = sorted(staged_named_count.items(),
                       key=operator.itemgetter(1), reverse=True)
 
-
-# print(staged_named_count)
 
 # Visualize Results     
 x_axis=[]

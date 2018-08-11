@@ -41,3 +41,6 @@ finnish-dep-parser-python3/model/fin_model.marmot
 finnish-dep-parser-python3/tmp_data/
 finnish-dep-parser-python3/*~
 .vscode/launch.json
+
+# Virtual enviroment
+venv/

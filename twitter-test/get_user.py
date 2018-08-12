@@ -14,16 +14,22 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 auth_api = API(auth)
 
-f = open("get_user.json", "w+")
+f = open("get_user_7.json", "w+")
 
 def printRoutine(inputTxt):
     """ Method to print in a file and on screen for debugging purposes """
-    # f.write(str(inputTxt)+'\n')
     json.dump(inputTxt,f)
     f.write(' \n')
 
 # account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
-account_list = [53292926]
+
+# account_list = [53292926] # Julie McCrossin
+# account_list=[99625563] # Ann Silberman
+# account_list=[12511062] # Barbara Jacoby
+# account_list=[144851483] # Nancy's Point
+# account_list=[16157175] # Nicole McLean
+# account_list=[374864146] # Rann Patterson
+account_list=[65594160] # Dr. Gia Sison
 
 # threshold 7 tweets , max 30
 # account_list = [499649171, 499648091, 961153933,

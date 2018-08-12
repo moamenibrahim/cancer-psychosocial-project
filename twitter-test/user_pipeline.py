@@ -49,8 +49,9 @@ def analyze_file(fileName, tweet_count):
 if __name__ == "__main__":
 
     processing = functions()
-    f = open("user_results.json", "w+")
-    tweet_count = 0
-    fread = open("get_user.json", "r")
-    tweet_count=analyze_file(fread,tweet_count)
-    f.close()
+    for x in range(1,7):
+        tweet_count = 0
+        f = open("users/results/user_results_"+str(x)+".json", "w+")
+        fread = open("users/get_user_"+str(x)+".json", "r")
+        tweet_count=analyze_file(fread,tweet_count)
+        f.close()

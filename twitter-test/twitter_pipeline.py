@@ -99,5 +99,6 @@ if __name__ == "__main__":
         fread = open("outputDir/2018-07-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
 
-    processing.stop_firebase()
     f.close()
+    if(processing.stop_firebase()==True):
+        break    

@@ -44,3 +44,6 @@ finnish-dep-parser-python3/*~
 
 # Virtual enviroment
 venv/
+
+# Ignore test files 
+test_*.py

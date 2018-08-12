@@ -269,7 +269,7 @@ class functions(object):
         self.th.cancel()
         while(self.th.is_alive):
             self.th.cancel()
-        return
+        return True
 
     ''' Finnish functions part '''
     def finnishParse(self, tweet, tweet_count):

@@ -55,3 +55,6 @@ if __name__ == "__main__":
         fread = open("users/get_user_"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
         f.close()
+    if(processing.stop_firebase()==True):
+        break
+    

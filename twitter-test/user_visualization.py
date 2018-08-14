@@ -99,7 +99,7 @@ for line in f.readlines():
         print("didn't translate this one - topic")
 
 
-    # Named-entity - Scatter
+    # Named-entity - Bar
     try:
         all_named = tweet_data['named entity']
         for named in all_named:
@@ -113,19 +113,34 @@ for line in f.readlines():
     except:
         print("didn't translate this one - named entity")
 
-    # # Named-entity-count - Scatter
-    # try:
-    #     all_named_count = tweet_data['Named Count']
-    #     for named in all_named_count:
-    #         if (named[1] != ''):
-    #             if (named[1] in staged_named_count):
-    #                 ## increment that named
-    #                 staged_named_count[named[1]] += 1
-    #             else:
-    #                 ## add named to list
-    #                 staged_named_count[named[1]] = 1    
-    # except:
-    #     print("didn't translate this one - named entity")
+
+    # # Sentiment - Bar 
+    try:
+        sentiment = tweet_data['sentiment']
+        if (sentiment != ''):
+            if (sentiment in staged_sentiment):
+                ## increment that Sentiment
+                staged_sentiment[sentiment] += 1
+            else:
+                ## add Sentiment to list
+                staged_sentiment[sentiment] = 1
+    except expression as identifier:
+        print("didn't translate this one - sentiment")
+
+
+    # Named-entity-count - Bar
+    try:
+        all_named_count = tweet_data['Named Count']
+        for named in all_named_count:
+            if (named[1] != ''):
+                if (named[1] in staged_named_count):
+                    ## increment that named
+                    staged_named_count[named[1]] += 1
+                else:
+                    ## add named to list
+                    staged_named_count[named[1]] = 1    
+    except:
+        print("didn't translate this one - named entity")
 
 staged_pos = sorted(staged_pos.items(),
                         key=operator.itemgetter(1), reverse=True)
@@ -138,6 +153,8 @@ staged_topic = sorted(staged_topic.items(),
 staged_dict = sorted(staged_dict.items(),
                       key=operator.itemgetter(1), reverse=True)
 staged_named_count = sorted(staged_named_count.items(),
+                      key=operator.itemgetter(1), reverse=True)
+staged_sentiment = sorted(staged_sentiment.items(),
                       key=operator.itemgetter(1), reverse=True)
 
 # Visualize Results     
@@ -281,7 +298,7 @@ data = [go.Bar(
 layout = go.Layout(
     title='Tweets length',
     xaxis=dict(
-        title='characters',    #EDIT 
+        title='characters',    
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -330,15 +347,4 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='named-count-detected-bar-2')
-
-# # Sentiment - Bar 
-# sentiment = tweet_data['sentiment']
-# if (sentiment != ''):
-#     if (sentiment in staged_sentiment):
-#         ## increment that Sentiment
-#         staged_sentiment[sentiment] += 1
-#     else:
-#         ## add Sentiment to list
-#         staged_sentiment[sentiment] = 1
-
+py.plot(fig, filename='named-count-detected--user')

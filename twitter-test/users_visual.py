@@ -6,8 +6,11 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly
 import operator
+import string
 from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 
+porter = PorterStemmer()
 
 plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
@@ -27,6 +30,15 @@ data_length=list()
 data_named_count=list()
 data_dict=list()
 data_topic=list()
+data_sentiment=list()
+
+named_fail=0
+named_count_fail=0
+pos_fail=0
+topic_fail=0
+sentiment_fail=0
+dict_fail=0
+length_fail=0
 
 for x in range(1,7):
 
@@ -40,7 +52,7 @@ for x in range(1,7):
     staged_named_count.append({})
 
     # TODO 
-    f = open("users/results/user_results_"+str(x)+".json", "r")
+    f = open("twitter-test/users/results/user_results_"+str(x)+".json", "r")
 
     # Get and populate results
     for line in f.readlines():
@@ -56,8 +68,8 @@ for x in range(1,7):
                 else:
                     ## add named_count to list
                     staged_named_count[x-1][named_count] = 1    
-        except:
-            print("didn't translate this one - named count")
+        except Exception as KeyError:
+            named_count_fail+=1
 
         # Length - Bar 
         try:
@@ -69,8 +81,8 @@ for x in range(1,7):
                 else:
                     ## add length to list
                     staged_length[x-1][length] = 1
-        except:
-            print("didn't translate this one - tweet length")
+        except Exception as KeyError:
+            length_fail+=1
 
         # Dictionary - sucess rate bar 
         try:
@@ -82,8 +94,8 @@ for x in range(1,7):
             else:
                 ## add rounded to list
                 staged_dict[x-1][rounded] = 1
-        except:
-            print("didn't translate this one - dictionary")
+        except Exception as KeyError:
+            dict_fail+=1
 
 
         # POS - Bar
@@ -97,14 +109,17 @@ for x in range(1,7):
                     else:
                         ## add pos to list
                         staged_pos[x-1][pos[0]] = pos[1]
-        except:
-            print("didn't translate this one - pos")
+        except Exception as KeyError:
+            pos_fail+=1
 
 
         # Topic - Bar 
         try:
             all_topic = tweet_data['topic']
             filtered_topics = [w for w in all_topic if not w in set(stopwords.words('english'))]
+            filtered_topics = [w for w in filtered_topics if not w in list(string.punctuation)]
+            filtered_topics = [porter.stem(word) for word in filtered_topics]
+
             if(len(filtered_topics)>3):
                 for topic in filtered_topics:
                     if (topic != '' and len(topic)>3):
@@ -114,13 +129,15 @@ for x in range(1,7):
                         else:
                             ## add topic to list
                             staged_topic[x-1][topic] = 1
-        except:
-            print("didn't translate this one - topic")
+        except Exception as KeyError:
+            topic_fail+=1
 
 
         # Named-entity - Bar
         try:
             all_named = tweet_data['named entity']
+            all_named = [w for w in all_named if not w in list(string.punctuation)]
+
             for named in all_named:
                 if (named[1] != ''):
                     if (named[1] in staged_named[x-1]):
@@ -129,8 +146,8 @@ for x in range(1,7):
                     else:
                         ## add named to list
                         staged_named[x-1][named[1]] = 1    
-        except:
-            print("didn't translate this one - named entity")
+        except Exception as KeyError:
+            named_fail+=1
 
 
         # # Sentiment - Bar 
@@ -149,8 +166,8 @@ for x in range(1,7):
                 else:
                     ## add Sentiment to list
                     staged_sentiment[x-1][sentiment_n] = 1
-        except:
-            print("didn't translate this one - sentiment")
+        except Exception as KeyError:
+            sentiment_fail+=1
 
     x_axis=[]
     y_axis=[]
@@ -217,6 +234,20 @@ for x in range(1,7):
         y=y_axis,
         name=str(x)
     ))
+    
+    x_axis = []
+    y_axis = []
+    for sentiment_v in staged_sentiment[x-1].items():
+        x_axis.append(sentiment_v[0])
+        y_axis.append(sentiment_v[1])
+    data_sentiment.append(go.Bar(
+        x=x_axis,
+        y=y_axis,
+        name=str(x)
+    ))
+
+print("named_fail: %d named_count_fail: %d pos_fail: %d topic_fail: %d sentiment_fail: %d dict_fail: %d length_fail: %d "
+    %(named_fail,named_count_fail,pos_fail,topic_fail,sentiment_fail,dict_fail,length_fail))
 
 
 ### VISUALIZATION SECTION ###
@@ -226,6 +257,8 @@ data_dict_total=[data_dict[0], data_dict[1], data_dict[2], data_dict[3], data_di
 data_topic_total=[data_topic[0], data_topic[1], data_topic[2], data_topic[3], data_topic[4], data_topic[5]]
 data_named_count_total=[data_named_count[0], data_named_count[1], data_named_count[2], data_named_count[3], data_named_count[4], data_named_count[5]]
 data_length_total=[data_length[0], data_length[1], data_length[2], data_length[3], data_length[4], data_length[5]]
+data_sentiment_total=[data_sentiment[0], data_sentiment[1], data_sentiment[2], data_sentiment[3], data_sentiment[4], data_sentiment[5]]
+
 
 # Visualize Results     
 layout = go.Layout(
@@ -366,3 +399,26 @@ layout = go.Layout(
 )
 fig = go.Figure(data=data_named_count_total, layout=layout)
 py.plot(fig, filename='named-count-detected--users')
+
+# Visualize Results
+layout = go.Layout(
+    title='Overall Sentiment Analysis',
+    xaxis=dict(
+        title='Sentiment score',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Frequency',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data_sentiment_total, layout=layout)
+py.plot(fig, filename='Sentiment-bar-streaming')

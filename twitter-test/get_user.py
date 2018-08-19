@@ -14,33 +14,28 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 auth_api = API(auth)
 
-f = open("get_user_7.json", "w+")
 
 def printRoutine(inputTxt):
     """ Method to print in a file and on screen for debugging purposes """
     json.dump(inputTxt,f)
     f.write(' \n')
 
-# account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
 
-# account_list = [53292926] # Julie McCrossin
-# account_list=[99625563] # Ann Silberman
-# account_list=[12511062] # Barbara Jacoby
-# account_list=[144851483] # Nancy's Point
-# account_list=[16157175] # Nicole McLean
-# account_list=[374864146] # Rann Patterson
-account_list=[65594160] # Dr. Gia Sison
+account_list = [53292926, # Julie McCrossin
+                99625563, # Ann Silberman
+                12511062, # Barbara Jacoby
+                144851483, # Nancy's Point
+                16157175, # Nicole McLean
+                374864146, # Rann Patterson
+                65594160] # Dr. Gia Sison
 
 # threshold 7 tweets , max 30
-# account_list = [499649171, 499648091, 961153933,
-#                 3172336367, 2841368445, 738032030714318849, 497992988, ] 
+# account_list = [499649171, 499648091, 961153933, 3172336367, 2841368445, 738032030714318849, 497992988] 
+# account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
 
-if (len(account_list) < 1):
-    print("Please provide a list of user ids.")
-    sys.exit(0)
 
 if len(account_list) > 0:
-    for target in account_list:
+    for index,target in enumerate(account_list):
         print("Getting data for " + str(target))
         item = auth_api.get_user(target)
         print("name: " + item.name)
@@ -59,11 +54,13 @@ if len(account_list) > 0:
             print("Average tweets per day: " + "%.2f" %
                 (float(tweets)/float(account_age_days)))
 
+
+        f = open("twitter-test/get_user_"+str(index+1)+".json", "w+")
+
         hashtags = []
         mentions = []
         tweet_count = 0
-        end_date = datetime.utcnow() - timedelta(days=3000)
-        for status in Cursor(auth_api.user_timeline, id=target).items():
+        for status in Cursor(auth_api.user_timeline, id=target, count=99999999).items():
             tweet_count += 1
             if hasattr(status, "entities"):
                 entities = status.entities
@@ -81,10 +78,7 @@ if len(account_list) > 0:
                                 name = ent["screen_name"]
                             if name is not None:
                                 mentions.append(name)
-                printRoutine({ "text" : status._json['text'], "entities" : status.entities })
-            if status.created_at < end_date:
-                # break
-                pass
+                printRoutine({"created at" : status.created_at.__str__(), "text" : status._json['text'], "entities" : status.entities })
 
         print("Most mentioned Twitter users:")
         for item, count in Counter(mentions).most_common(10):

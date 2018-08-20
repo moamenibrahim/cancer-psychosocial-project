@@ -47,3 +47,9 @@ venv/
 
 # Ignore test files 
 test_*.py
+
+# Results files 
+/twitter-test/*.json
+/twitter-test/outputDir
+/twitter-test/search_dir
+/twitter-test/users

@@ -356,7 +356,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='named-count-detected--user')
+py.plot(fig, filename='named-count-detected-user')
 
 
 # Visualize Results
@@ -389,4 +389,4 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data, layout=layout)
-py.plot(fig, filename='Sentiment-bar-streaming')
+py.plot(fig, filename='Sentiment-bar-user')

@@ -273,6 +273,7 @@ layout = go.Layout(
     ),
     yaxis=dict(
         title='Number of occurence in total',
+        type='log',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,

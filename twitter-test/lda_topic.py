@@ -40,19 +40,19 @@ class lda_modeling(object):
 		output = ldamodel.print_topics(10)
 		# print (output)
 
-	# def train_lda(corpus, total_topics=2):
+	def train_lda(self,corpus, total_topics=2):
 		
-	# 	norm_tokenized_corpus = normalize_corpus(corpus, tokenize=True)
-	# 	dictionary = corpora.Dictionary(norm_tokenized_corpus)
-	# 	mapped_corpus = [dictionary.doc2bow(text) 
-	# 					for text in norm_tokenized_corpus]
-	# 	tfidf = models.TfidfModel(mapped_corpus)
-	# 	corpus_tfidf = tfidf[mapped_corpus]
-	# 	self.lda = models.LdaModel(corpus_tfidf, 
-	# 						id2word=dictionary,
-	# 						iterations=1000,
-	# 						num_topics=total_topics)
-	# 	return
+		norm_tokenized_corpus = normalize_corpus(corpus, tokenize=True)
+		dictionary = corpora.Dictionary(norm_tokenized_corpus)
+		mapped_corpus = [dictionary.doc2bow(text) 
+						for text in norm_tokenized_corpus]
+		tfidf = models.TfidfModel(mapped_corpus)
+		corpus_tfidf = tfidf[mapped_corpus]
+		self.lda = models.LdaModel(corpus_tfidf, 
+							id2word=dictionary,
+							iterations=1000,
+							num_topics=total_topics)
+		return
 
 	def preprocess_sentences(self, doc_complete):
 		stop = set(stopwords.words('english'))

@@ -16,7 +16,7 @@ plotly.tools.set_credentials_file(
     username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
 
 # f = open("stream_results.json", "r")
-f = open("user_results.json", "r")
+f = open("stream_results.json", "r")
 
 staged_list = {}
 failed=0
@@ -100,9 +100,29 @@ x_axis=[]
 y_axis=[]
 for dict_item in staged_list:
     x_axis.append(dict_item[0])
-    y_axis.append(dict_item[1])
+    y_axis.append(dict_item[1]/repeated*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
 )]
-py.plot(data, filename='Categorization')
+layout = go.Layout(
+    title='Categorization',
+    xaxis=dict(
+        title='Categories',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Percentage of Tweets',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='Categorization')

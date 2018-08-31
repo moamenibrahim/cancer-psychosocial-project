@@ -18,6 +18,8 @@ plotly.tools.set_credentials_file(
 
 f = open("twitter-test/stream_results.json", "r")
 
+tweets=17200
+
 staged_pos = {}
 staged_lang = {}
 staged_hyponyms = {}
@@ -34,6 +36,14 @@ pos_fail=0
 topic_fail=0
 sentiment_fail=0
 dict_fail=0
+
+ORGANIZATION_count=0
+PERSON_count=0
+LOCATION_count=0
+TIME_count=0
+MONEY_count=0
+DATE_count=0
+PERCENT_count=0
 
 # Get and populate results
 for line in f.readlines():
@@ -132,6 +142,21 @@ for line in f.readlines():
         all_named = tweet_data['named entity']
         all_named = [w for w in all_named if not w in list(string.punctuation)]
 
+        if(bool(re.search('TIME',str(all_named)))):
+            TIME_count+=1
+        if(bool(re.search('ORGANIZATION',str(all_named)))):
+            ORGANIZATION_count+=1
+        if(bool(re.search('PERSON',str(all_named)))):
+            PERSON_count+=1
+        if(bool(re.search('LOCATION',str(all_named)))):
+            LOCATION_count+=1
+        if(bool(re.search('MONEY',str(all_named)))):
+            MONEY_count+=1
+        if(bool(re.search('DATE',str(all_named)))):
+            DATE_count+=1
+        if(bool(re.search('PERCENT',str(all_named)))):
+            PERCENT_count+=1
+
         for named in all_named:
             if (named[1] != ''):
                 if (named[1] in staged_named):
@@ -142,6 +167,8 @@ for line in f.readlines():
                     staged_named[named[1]] = 1    
     except Exception as KeyError:
         named_fail+=1
+
+
 
     # # Sentiment - Bar 
     try:
@@ -184,12 +211,16 @@ staged_sentiment = sorted(staged_sentiment.items(),
                       key=operator.itemgetter(1), reverse=True)
 
 
-# Visualize Results     
+# Visualize Results  
+total = 0    
 x_axis=[]
 y_axis=[]
+for pos_sum in staged_pos:
+    total+=pos_sum[1]
+print(total)
 for pos in staged_pos:
     x_axis.append(pos[0])
-    y_axis.append(pos[1])
+    y_axis.append(pos[1]/total*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -205,7 +236,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of occurence in total',
+        title='Percentage of occurence',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -217,15 +248,20 @@ fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='part-of-speech-bar-streaming')
 
 
-# Visualize Results     
+# Visualize Results 
+total=0
 x_axis=[]
 y_axis=[]
+del staged_named[0]
+for named_sum in staged_named:
+    total+=float(named_sum[1])
+print(total)
 for named in staged_named:
     x_axis.append(named[0])
-    y_axis.append(named[1])
+    y_axis.append(named[1]/total*100)
 data = [go.Bar(
-    x=x_axis[1:],
-    y=y_axis[1:]
+    x=x_axis[0:],
+    y=y_axis[0:]
 )]
 layout = go.Layout(
     title='Named entity',
@@ -238,7 +274,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of occurence in total',
+        title='Percentage of occurence',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -250,12 +286,40 @@ fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='named-entity-bar-streaming')
 
 
+# Visualize Results 
+data = [go.Bar(
+    x=['ORGANIZATION','LOCATION','PERSON','TIME','DATE','MONEY','PERCENT'],
+    y=[ORGANIZATION_count/tweets*100,LOCATION_count/tweets*100,PERSON_count/tweets*100,TIME_count/tweets*100,DATE_count/tweets*100,MONEY_count/tweets*100,PERCENT_count/tweets*100]
+)]
+layout = go.Layout(
+    title='Named entity',
+    xaxis=dict(
+        title='Entities',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    ),
+    yaxis=dict(
+        title='Percentage of Tweets',
+        titlefont=dict(
+            family='Courier New, monospace',
+            size=18,
+            color='#7f7f7f'
+        )
+    )
+)
+fig = go.Figure(data=data, layout=layout)
+py.plot(fig, filename='named-entity-percent-bar-streaming')
+
+
 # Visualize Results     
 x_axis=[]
 y_axis=[]
 for topic in staged_topic:
     x_axis.append(topic[0])
-    y_axis.append(topic[1])
+    y_axis.append(topic[1]/tweets*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -272,7 +336,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of occurence in total',
+        title='Percentage of occurence',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -289,7 +353,7 @@ x_axis=[]
 y_axis=[]
 for dict_item in staged_dict:
     x_axis.append(dict_item[0])
-    y_axis.append(dict_item[1])
+    y_axis.append(dict_item[1]/tweets*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -297,7 +361,7 @@ data = [go.Bar(
 layout = go.Layout(
     title='Dictionary hits',
     xaxis=dict(
-        title='Percentage of success',
+        title='Percentage of successful hits',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -305,7 +369,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of occurence in total (tweets)',
+        title='Percentage of tweets',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -322,7 +386,7 @@ x_axis = []
 y_axis = []
 for length in staged_length:
     x_axis.append(length[0])
-    y_axis.append(length[1])
+    y_axis.append(length[1]/tweets*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -330,7 +394,7 @@ data = [go.Bar(
 layout = go.Layout(
     title='Tweets length',
     xaxis=dict(
-        title='characters', 
+        title='Tweet length (words)', 
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -338,7 +402,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of occurence',
+        title='Percentages of tweets',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -355,7 +419,7 @@ x_axis = []
 y_axis = []
 for lang in staged_lang:
     x_axis.append(lang[0])
-    y_axis.append(lang[1])
+    y_axis.append(lang[1]/tweets*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -371,7 +435,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of tweets',
+        title='Percentage of tweets',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -388,7 +452,7 @@ x_axis = []
 y_axis = []
 for named_count in staged_named_count:
     x_axis.append(named_count[0])
-    y_axis.append(named_count[1])
+    y_axis.append(named_count[1]/tweets*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -404,7 +468,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Number of times detected',
+        title='Percentage of tweets',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,
@@ -421,7 +485,7 @@ x_axis = []
 y_axis = []
 for sentiment in staged_sentiment:
     x_axis.append(sentiment[0])
-    y_axis.append(sentiment[1])
+    y_axis.append(sentiment[1]/tweets*100)
 data = [go.Bar(
     x=x_axis,
     y=y_axis
@@ -437,7 +501,7 @@ layout = go.Layout(
         )
     ),
     yaxis=dict(
-        title='Frequency',
+        title='Percentage of tweets',
         titlefont=dict(
             family='Courier New, monospace',
             size=18,

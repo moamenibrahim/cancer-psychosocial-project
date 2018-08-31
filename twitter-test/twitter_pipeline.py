@@ -87,15 +87,15 @@ if __name__ == "__main__":
     stemmer = nltk.stem.PorterStemmer()
     f = open("stream_results.json", "w+")
     tweet_count = 0
-    for x in range(3,30):
+    for x in range(3,31):
         fread = open("outputDir/2018-03-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
 
-    for x in range(3,24):
+    for x in range(3,25):
         fread = open("outputDir/2018-06-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
 
-    for x in range(9,26):
+    for x in range(9,27):
         fread = open("outputDir/2018-07-"+str(x)+".json", "r")
         tweet_count=analyze_file(fread,tweet_count)
 

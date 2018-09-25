@@ -13,7 +13,7 @@ from nltk.stem.porter import PorterStemmer
 porter = PorterStemmer()
 
 plotly.tools.set_credentials_file(
-    username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
+    username='moamenaibrahim', api_key='pk39TGSH9wl3WEUjWRCL')
 
 f = open("twitter-test/user_results.json", "r")
 
@@ -308,6 +308,7 @@ layout = go.Layout(
     title='Extracted topics',
     xaxis=dict(
         range=[0,50],
+        # autorange=True,
         title='Topics',
         titlefont=dict(
             family='Courier New, monospace',

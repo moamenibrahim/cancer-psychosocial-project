@@ -102,6 +102,15 @@ class functions(object):
                     words.append(word)
         return ' '.join(words)
 
+    def remove_emojis(self, text):
+        emoji_pattern = re.compile("["
+                u"\U0001F600-\U0001F64F"  # emoticons
+                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                                "]+", flags=re.UNICODE)
+
+        return emoji_pattern.sub(r'', text) # no emoji
 
     def get_pos(self, tweet):
         """ 
@@ -267,7 +276,7 @@ class functions(object):
         """Cancelling the thread responsible for 
         re-authorize access to firebase"""
         self.th.cancel()
-        while(self.th.is_alive):
+        if(self.th.is_alive):
             self.th.cancel()
         return True
 

@@ -1,0 +1,20 @@
+technical_list=[
+    "XRCC1",
+    "EGFR",
+    "KRas",
+    "P53",
+    "BRCA1",
+    "LCIS",
+    "carcinoma in situ",
+    "sarcoma",
+    "metastasis", 
+    "oncology", 
+    "TNM-luokitus",
+    "TNM",
+    "BRCA1",
+    "SCLC",
+    "NSCLC",
+    "PNET",
+    "CNS Lymphoma",
+    "NSCLC"
+]

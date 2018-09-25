@@ -10,7 +10,7 @@ from nltk.corpus import stopwords
 
 
 plotly.tools.set_credentials_file(
-    username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
+    username='moamenaibrahim', api_key='pk39TGSH9wl3WEUjWRCL')
 
 f = open("cancerType_results.json", "r")
 # Get and populate results

@@ -54,3 +54,5 @@ test_*.py
 /twitter-test/search_dir
 /twitter-test/users
 /twitter-test/time_div
+/twitter-test/stream
+/twitter-test/single_user

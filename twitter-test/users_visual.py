@@ -40,7 +40,7 @@ sentiment_fail=0
 dict_fail=0
 length_fail=0
 
-for x in range(1,7):
+for x in range(2014,2019):
 
     staged_pos.append({})
     staged_hyponyms.append({})
@@ -51,23 +51,28 @@ for x in range(1,7):
     staged_dict.append({})
     staged_named_count.append({})
 
-    # TODO 
-    f = open("twitter-test/users/results/user_results_"+str(x)+".json", "r")
+    tweet_count=0
+
+    f = open("twitter-test/time_div/results/user_results_"+str(x)+".json", "r")
+    print(f)
 
     # Get and populate results
     for line in f.readlines():
-        tweet_data = json.loads(line)
+        
+        tweet_count=tweet_count+1
 
+        tweet_data = json.loads(line)
+        # print(tweet_data)
         try:
             # Named count - Bar 
             named_count = tweet_data['Named Count']
             if (named_count != ''):
-                if (named_count in staged_named_count[x-1]):
+                if (named_count in staged_named_count[x-2014]):
                     ## increment that named_count
-                    staged_named_count[x-1][named_count] += 1
+                    staged_named_count[x-2014][named_count] += 1
                 else:
                     ## add named_count to list
-                    staged_named_count[x-1][named_count] = 1    
+                    staged_named_count[x-2014][named_count] = 1    
         except Exception as KeyError:
             named_count_fail+=1
 
@@ -75,12 +80,12 @@ for x in range(1,7):
         try:
             length = tweet_data['tweet length']
             if (length != ''):
-                if (length in staged_length[x-1]):
+                if (length in staged_length[x-2014]):
                     ## increment that length
-                    staged_length[x-1][length] += 1
+                    staged_length[x-2014][length] += 1
                 else:
                     ## add length to list
-                    staged_length[x-1][length] = 1
+                    staged_length[x-2014][length] = 1
         except Exception as KeyError:
             length_fail+=1
 
@@ -88,12 +93,12 @@ for x in range(1,7):
         try:
             dict_result = tweet_data['check_dictionary']*100
             rounded = round(dict_result)
-            if (rounded in staged_dict[x-1]):
+            if (rounded in staged_dict[x-2014]):
                 ## increment that rounded
-                staged_dict[x-1][rounded] += 1
+                staged_dict[x-2014][rounded] += 1
             else:
                 ## add rounded to list
-                staged_dict[x-1][rounded] = 1
+                staged_dict[x-2014][rounded] = 1
         except Exception as KeyError:
             dict_fail+=1
 
@@ -102,13 +107,16 @@ for x in range(1,7):
         try:
             all_elements = tweet_data['pos']
             for pos in all_elements[0]:
-                if (pos[0] != ''):
-                    if (pos[0] in staged_pos[x-1]):
+                if ((pos[0] != '') and (pos[0] != '.') and (pos[0] != ',') 
+                and (pos[0] != '#') and (pos[0] != ':') and (pos[0] != '\'\'') 
+                and (pos[0] != ')') and (pos[0] != '(') and (pos[0] != '\"\"') 
+                and (pos[0] != '$') and (pos[0] != '``')):
+                    if (pos[0] in staged_pos[x-2014]):
                         ## increment that pos
-                        staged_pos[x-1][pos[0]] += 1
+                        staged_pos[x-2014][pos[0]] += 1
                     else:
                         ## add pos to list
-                        staged_pos[x-1][pos[0]] = pos[1]
+                        staged_pos[x-2014][pos[0]] = pos[1]
         except Exception as KeyError:
             pos_fail+=1
 
@@ -123,12 +131,12 @@ for x in range(1,7):
             if(len(filtered_topics)>3):
                 for topic in filtered_topics:
                     if (topic != '' and len(topic)>3):
-                        if (topic in staged_topic[x-1]):
+                        if (topic in staged_topic[x-2014]):
                             ## increment that topic
-                            staged_topic[x-1][topic] += 1
+                            staged_topic[x-2014][topic] += 1
                         else:
                             ## add topic to list
-                            staged_topic[x-1][topic] = 1
+                            staged_topic[x-2014][topic] = 1
         except Exception as KeyError:
             topic_fail+=1
 
@@ -140,12 +148,12 @@ for x in range(1,7):
 
             for named in all_named:
                 if (named[1] != ''):
-                    if (named[1] in staged_named[x-1]):
+                    if (named[1] in staged_named[x-2014]):
                         ## increment that named
-                        staged_named[x-1][named[1]] += 1
+                        staged_named[x-2014][named[1]] += 1
                     else:
                         ## add named to list
-                        staged_named[x-1][named[1]] = 1    
+                        staged_named[x-2014][named[1]] = 1    
         except Exception as KeyError:
             named_fail+=1
 
@@ -160,18 +168,18 @@ for x in range(1,7):
             else:
                 sentiment_n=0
             if (sentiment_n != ''):
-                if (sentiment_n in staged_sentiment[x-1]):
+                if (sentiment_n in staged_sentiment[x-2014]):
                     ## increment that Sentiment
-                    staged_sentiment[x-1][sentiment_n] += 1
+                    staged_sentiment[x-2014][sentiment_n] += 1
                 else:
                     ## add Sentiment to list
-                    staged_sentiment[x-1][sentiment_n] = 1
+                    staged_sentiment[x-2014][sentiment_n] = 1
         except Exception as KeyError:
             sentiment_fail+=1
 
     x_axis=[]
     y_axis=[]
-    for pos_key,pos_value in staged_pos[x-1].items():
+    for pos_key,pos_value in staged_pos[x-2014].items():
         x_axis.append(pos_key)
         y_axis.append(pos_value)
     data_pos.append(go.Bar(
@@ -182,7 +190,7 @@ for x in range(1,7):
 
     x_axis=[]
     y_axis=[]
-    for named_key,named_value in staged_named[x-1].items():
+    for named_key,named_value in staged_named[x-2014].items():
         x_axis.append(named_key)
         y_axis.append(named_value)
     data_named.append(go.Bar(
@@ -193,7 +201,7 @@ for x in range(1,7):
 
     x_axis=[]
     y_axis=[]
-    for topic_key,topic_value in staged_topic[x-1].items():
+    for topic_key,topic_value in staged_topic[x-2014].items():
         x_axis.append(topic_key)
         y_axis.append(topic_value)
     data_topic.append(go.Bar(
@@ -204,7 +212,7 @@ for x in range(1,7):
 
     x_axis=[]
     y_axis=[]
-    for dict_key,dict_value in staged_dict[x-1].items():
+    for dict_key,dict_value in staged_dict[x-2014].items():
         x_axis.append(dict_key)
         y_axis.append(dict_value)
     data_dict.append(go.Bar(
@@ -215,7 +223,7 @@ for x in range(1,7):
 
     x_axis = []
     y_axis = []
-    for length_v in staged_length[x-1].items():
+    for length_v in staged_length[x-2014].items():
         x_axis.append(length_v[0])
         y_axis.append(length_v[1])
     data_length.append(go.Bar(
@@ -226,7 +234,7 @@ for x in range(1,7):
   
     x_axis = []
     y_axis = []
-    for named_count_v in staged_named_count[x-1].items():
+    for named_count_v in staged_named_count[x-2014].items():
         x_axis.append(named_count_v[0])
         y_axis.append(named_count_v[1])
     data_named_count.append(go.Bar(
@@ -237,7 +245,7 @@ for x in range(1,7):
     
     x_axis = []
     y_axis = []
-    for sentiment_v in staged_sentiment[x-1].items():
+    for sentiment_v in staged_sentiment[x-2014].items():
         x_axis.append(sentiment_v[0])
         y_axis.append(sentiment_v[1])
     data_sentiment.append(go.Bar(
@@ -251,13 +259,13 @@ print("named_fail: %d named_count_fail: %d pos_fail: %d topic_fail: %d sentiment
 
 
 ### VISUALIZATION SECTION ###
-data_pos_total=[data_pos[0], data_pos[1], data_pos[2], data_pos[3], data_pos[4], data_pos[5]]
-data_named_total=[data_named[0], data_named[1], data_named[2], data_named[3], data_named[4], data_named[5]]
-data_dict_total=[data_dict[0], data_dict[1], data_dict[2], data_dict[3], data_dict[4], data_dict[5]]
-data_topic_total=[data_topic[0], data_topic[1], data_topic[2], data_topic[3], data_topic[4], data_topic[5]]
-data_named_count_total=[data_named_count[0], data_named_count[1], data_named_count[2], data_named_count[3], data_named_count[4], data_named_count[5]]
-data_length_total=[data_length[0], data_length[1], data_length[2], data_length[3], data_length[4], data_length[5]]
-data_sentiment_total=[data_sentiment[0], data_sentiment[1], data_sentiment[2], data_sentiment[3], data_sentiment[4], data_sentiment[5]]
+data_pos_total=[data_pos[0], data_pos[1], data_pos[2], data_pos[3], data_pos[4]]
+data_named_total=[data_named[0], data_named[1], data_named[2], data_named[3], data_named[4]]
+data_dict_total=[data_dict[0], data_dict[1], data_dict[2], data_dict[3], data_dict[4]]
+data_topic_total=[data_topic[0], data_topic[1], data_topic[2], data_topic[3], data_topic[4]]
+data_named_count_total=[data_named_count[0], data_named_count[1], data_named_count[2], data_named_count[3], data_named_count[4]]
+data_length_total=[data_length[0], data_length[1], data_length[2], data_length[3], data_length[4]]
+data_sentiment_total=[data_sentiment[0], data_sentiment[1], data_sentiment[2], data_sentiment[3], data_sentiment[4]]
 
 
 # Visualize Results     
@@ -352,7 +360,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data_dict_total, layout=layout)
-py.plot(fig, filename='dictionary-items-bar-users')
+# py.plot(fig, filename='dictionary-items-bar-users')
 
 # Visualize Results
 layout = go.Layout(
@@ -398,7 +406,7 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data_named_count_total, layout=layout)
-py.plot(fig, filename='named-count-detected--users')
+# py.plot(fig, filename='named-count-detected--users')
 
 # Visualize Results
 layout = go.Layout(
@@ -421,4 +429,4 @@ layout = go.Layout(
     )
 )
 fig = go.Figure(data=data_sentiment_total, layout=layout)
-py.plot(fig, filename='Sentiment-bar-streaming')
+py.plot(fig, filename='Sentiment-bar-users')

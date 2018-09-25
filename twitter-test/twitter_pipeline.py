@@ -1,6 +1,7 @@
 import json,re,nltk
 from tweets_processing import functions
 from keywords_helper import cancer_keywords as cancer
+from visualization import visualize
 
 def analyze_file(fileName, tweet_count):
     """ Method to analyze file by file and calls all other methods """
@@ -32,8 +33,11 @@ def analyze_file(fileName, tweet_count):
 
             # if tweet_data['lang'] == 'fi':
             #     processing.finnishParse(u"%s"%str(pure_text), tweet_count)
-          
-            translated = processing.get_translate(u"%s"%str(pure_text), tweet_data['lang'])
+
+            for_translation=processing.remove_emojis(pure_text)
+
+            translated = processing.get_translate(u"%s"%str(for_translation), tweet_data['lang'])
+
             if translated:
                 dict_result = processing.check_dictionary(u"%s"%str(translated))
                 pos = []
@@ -101,4 +105,7 @@ if __name__ == "__main__":
 
     f.close()
     if(processing.stop_firebase()==True):
-        break    
+        pass    
+
+    visualize(tweet_count)
+    

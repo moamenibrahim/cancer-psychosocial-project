@@ -48,7 +48,7 @@ venv/
 # Ignore test files 
 test_*.py
 
-# Results files 
+# Twitter files 
 /twitter-test/*.json
 /twitter-test/outputDir
 /twitter-test/search_dir
@@ -56,3 +56,7 @@ test_*.py
 /twitter-test/time_div
 /twitter-test/stream
 /twitter-test/single_user
+
+# Suomi24 files
+/scraper-test/textdumps
+/scraper-test/*.json

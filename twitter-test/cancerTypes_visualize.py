@@ -12,7 +12,7 @@ from nltk.corpus import stopwords
 plotly.tools.set_credentials_file(
     username='moamenaibrahim', api_key='pk39TGSH9wl3WEUjWRCL')
 
-f = open("cancerType_results.json", "r")
+f = open("twitter-test/stream/cancerType_results.json", "r")
 # Get and populate results
 for line in f.readlines():
     staged_pos = json.loads(line)

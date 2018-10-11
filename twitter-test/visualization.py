@@ -478,7 +478,7 @@ def visualize(tweets):
         )
     )
     fig = go.Figure(data=data, layout=layout)
-    py.plot(fig, filename='named-count-detected-bar-streaming')
+    # py.plot(fig, filename='named-count-detected-bar-streaming')
 
 
     # Visualize Results

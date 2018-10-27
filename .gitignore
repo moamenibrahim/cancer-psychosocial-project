@@ -1,39 +1,9 @@
-*.py[cod]
-
-# C extensions
-*.so
-
 # Packages
-*.egg
-*.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
+*.py[cod]
 __pycache__
 
 # Installer logs
 pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
 
 # Dependencies and temp files
 finnish-dep-parser-python3/LIBS-LOCAL/
@@ -60,3 +30,6 @@ test_*.py
 # Suomi24 files
 /scraper-test/textdumps
 /scraper-test/*.json
+
+# Machine learning models 
+glove/

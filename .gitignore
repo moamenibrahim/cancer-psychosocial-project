@@ -34,3 +34,6 @@ test_*.py
 # Machine learning models 
 glove/
 pandas/
+
+# Vscode files
+.vscode

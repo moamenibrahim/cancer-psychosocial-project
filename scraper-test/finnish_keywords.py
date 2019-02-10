@@ -1,4 +1,4 @@
-illness_list=[  "syöpä",
+illness_list = ["syöpä",
                 "syövän",
                 "syöpiä",
                 "kasvain",
@@ -7,34 +7,34 @@ illness_list=[  "syöpä",
                 "kasvaimia",
                 "tauti"]
 
-treatment_list=["hoito",
-                "hoidon",
-                "hoidot",
-                "hoitoa",
-                "tutkimus",
-                "leikkaus",
-                "lääkitys",
-                "säteily",
-                "tarkastus",
-                "tarkastuksen"]
+treatment_list = ["hoito",
+                  "hoidon",
+                  "hoidot",
+                  "hoitoa",
+                  "tutkimus",
+                  "leikkaus",
+                  "lääkitys",
+                  "säteily",
+                  "tarkastus",
+                  "tarkastuksen"]
 
-death_list=[    "kuolla",
-                "kuollut",
-                "kuolen",
-                "kuoli"]
+death_list = ["kuolla",
+              "kuollut",
+              "kuolen",
+              "kuoli"]
 
-social_list=[   "ystävä",
-                "kaveri",
-                "rakastettu",
-                "läheinen",
-                "rakas",
-                "äiti",
-                "isä"]
+social_list = ["ystävä",
+               "kaveri",
+               "rakastettu",
+               "läheinen",
+               "rakas",
+               "äiti",
+               "isä"]
 
-financial_list=["raha",
-                "hinta",
-                "hintava",
-                "arvo",
-                "maksaa",
-                "maksoi",
-                "määrä"]
+financial_list = ["raha",
+                  "hinta",
+                  "hintava",
+                  "arvo",
+                  "maksaa",
+                  "maksoi",
+                  "määrä"]

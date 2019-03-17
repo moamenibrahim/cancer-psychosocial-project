@@ -24,6 +24,7 @@ from nltk.corpus import wordnet as wn
 from nltk.tokenize import RegexpTokenizer
 from os.path import expanduser
 from nltk.tag import StanfordNERTagger
+from nltk.tag import StanfordPOSTagger
 sys.path.insert(0, '../IBM')
 from ibmNLPunderstanding import AlchemyNLPunderstanding
 from nameparser.parser import HumanName
@@ -191,12 +192,12 @@ class functions(object):
         punc_free = ' '.join(ch for ch in filtered_sentence if ch not in exclude)
         return filtered_sentence
 
-    def call_train_lda(self, location):
+    def call_train_lda(self):
         """
         Train Topic extraction from text using LDA (Latent Dirichet Allocation): 
         """
         try:
-            self.lda.train_lda(location)
+            self.lda.train_lda()
         except:
             print("Failed to train topic classifier")
 

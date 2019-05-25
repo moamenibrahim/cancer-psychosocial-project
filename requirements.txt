@@ -1,4 +1,5 @@
 asn1crypto==0.24.0
+astroid==2.2.5
 attrs==18.1.0
 autobahn==18.7.1
 Automat==0.7.0
@@ -25,13 +26,16 @@ idna==2.7
 incremental==17.5.0
 ipython==7.0.1
 ipython-genutils==0.2.0
+isort==4.3.20
 jedi==0.13.1
 jmespath==0.9.3
 jsonschema==2.6.0
 jupyter-core==4.4.0
 jws==0.1.3
 kiwisolver==1.0.1
+lazy-object-proxy==1.4.1
 matplotlib==2.2.3
+mccabe==0.6.1
 nameparser==0.5.7
 nbformat==4.4.0
 nltk==3.3
@@ -43,6 +47,7 @@ parso==0.3.1
 pexpect==4.6.0
 pickleshare==0.7.5
 Pillow==5.2.0
+pkg-resources==0.0.0
 plotly==3.1.1
 prompt-toolkit==2.0.6
 protobuf==3.6.0
@@ -55,6 +60,7 @@ pycryptodome==3.4.3
 pyenchant==2.0.0
 Pygments==2.2.0
 PyHamcrest==1.9.0
+pylint==2.3.1
 pyOpenSSL==18.0.0
 pyparsing==2.2.0
 Pyrebase==3.0.27
@@ -82,7 +88,9 @@ traitlets==4.3.2
 tweepy==3.6.0
 Twisted==18.7.0
 txaio==18.7.1
+typed-ast==1.3.5
 watson-developer-cloud==1.6.0
 wcwidth==0.1.7
 wordcloud==1.5.0
+wrapt==1.11.1
 zope.interface==4.5.0

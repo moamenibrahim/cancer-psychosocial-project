@@ -1,34 +1,34 @@
 import json
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 \
-import Features, EntitiesOptions, KeywordsOptions, SentimentOptions
-import sys 
+    import Features, EntitiesOptions, KeywordsOptions, SentimentOptions
+import sys
+
 
 class AlchemyNLPunderstanding(object):
-  def __init__(self):
-    self.natural_language_understanding = NaturalLanguageUnderstandingV1(
-        username='538f0686-d66e-467f-a85a-9226cde737bb',
-        password='zZuFzslKLDeC',
-        version='2017-02-27')
+    def __init__(self):
+        self.natural_language_understanding = NaturalLanguageUnderstandingV1(
+            username='538f0686-d66e-467f-a85a-9226cde737bb',
+            password='zZuFzslKLDeC',
+            version='2017-02-27')
 
-  def get_response(self,text):
-    try:
-      response = self.natural_language_understanding.analyze(
-        text=text,
-        features=Features(
-          sentiment=SentimentOptions(),
-          entities=EntitiesOptions(
-            emotion=True,
-            sentiment=True,
-            limit=2),
-          keywords=KeywordsOptions(
-            emotion=True,
-            sentiment=True,
-            limit=2)))
-      return json.dumps(response, indent=2)
-    except:
-      print("Error: unsupported text language for natural language understanding")
-
+    def get_response(self, text):
+        try:
+            response = self.natural_language_understanding.analyze(
+                text=text,
+                features=Features(
+                    sentiment=SentimentOptions(),
+                    entities=EntitiesOptions(
+                        emotion=True,
+                        sentiment=True,
+                        limit=2),
+                    keywords=KeywordsOptions(
+                        emotion=True,
+                        sentiment=True,
+                        limit=2)))
+            return json.dumps(response, indent=2)
+        except:
+            print("Error: unsupported text language for natural language understanding")
 
 
 # NLP_understanding = AlchemyNLPunderstanding()

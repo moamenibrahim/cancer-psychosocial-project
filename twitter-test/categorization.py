@@ -19,8 +19,8 @@ plotly.tools.set_credentials_file(
 f = open("twitter-test/stream/stream_results.json", "r")
 
 staged_list = {}
-failed=0
-repeated=0
+failed = 0
+repeated = 0
 
 # Get and populate results
 for line in f.readlines():
@@ -32,72 +32,72 @@ for line in f.readlines():
 
         if (any(word in all_topic for word in category.family_list)
             or any(stemmer.stem(word) in all_topic for word in category.family_list)
-            or any(word in hyponyms for word in category.family_list)):
-            repeated+=1
+                or any(word in hyponyms for word in category.family_list)):
+            repeated += 1
             if ('family' in staged_list):
-                ## increment that topic
+                # increment that topic
                 staged_list['family'] += 1
             else:
-                ## add topic to list
+                # add topic to list
                 staged_list['family'] = 1
 
         if (any(word in all_topic for word in category.friend_list)
             or any(stemmer.stem(word) in all_topic for word in category.friend_list)
-            or any(word in hyponyms for word in category.friend_list)):
-            repeated+=1
+                or any(word in hyponyms for word in category.friend_list)):
+            repeated += 1
             if ('friend' in staged_list):
-                ## increment that topic
+                # increment that topic
                 staged_list['friend'] += 1
             else:
-                ## add topic to list
+                # add topic to list
                 staged_list['friend'] = 1
 
         if (any(word in all_topic for word in category.money_list)
             or any(stemmer.stem(word) in all_topic for word in category.money_list)
-            or any(word in hyponyms for word in category.money_list)):
-            repeated+=1
+                or any(word in hyponyms for word in category.money_list)):
+            repeated += 1
             if ('money' in staged_list):
-                ## increment that topic
+                # increment that topic
                 staged_list['money'] += 1
             else:
-                ## add topic to list
+                # add topic to list
                 staged_list['money'] = 1
-            
+
         if (any(word in all_topic for word in category.treatment_list)
             or any(stemmer.stem(word) in all_topic for word in category.treatment_list)
-            or any(word in hyponyms for word in category.treatment_list)):
-            repeated+=1
+                or any(word in hyponyms for word in category.treatment_list)):
+            repeated += 1
             if ('treatment' in staged_list):
-                ## increment that topic
+                # increment that topic
                 staged_list['treatment'] += 1
             else:
-                ## add topic to list
-                staged_list['treatment'] = 1   
+                # add topic to list
+                staged_list['treatment'] = 1
 
         if (any(word in all_topic for word in category.lifestyle_list)
             or any(stemmer.stem(word) in all_topic for word in category.lifestyle_list)
-            or any(word in hyponyms for word in category.lifestyle_list)):
-            repeated+=1
+                or any(word in hyponyms for word in category.lifestyle_list)):
+            repeated += 1
             if ('lifestyle' in staged_list):
-                ## increment that topic
+                # increment that topic
                 staged_list['lifestyle'] += 1
             else:
-                ## add topic to list
+                # add topic to list
                 staged_list['lifestyle'] = 1
-            
+
     except Exception as KeyError:
-        failed+=1
+        failed += 1
 
 print(staged_list)
-print("failed to categorize %d"%failed)
-print("overall repetition %d"%repeated)
+print("failed to categorize %d" % failed)
+print("overall repetition %d" % repeated)
 
 staged_list = sorted(staged_list.items(),
-                      key=operator.itemgetter(1), reverse=True)
+                     key=operator.itemgetter(1), reverse=True)
 
-# Visualize Results     
-x_axis=[]
-y_axis=[]
+# Visualize Results
+x_axis = []
+y_axis = []
 for dict_item in staged_list:
     x_axis.append(dict_item[0])
     y_axis.append(dict_item[1]/repeated*100)

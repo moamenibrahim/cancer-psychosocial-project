@@ -1,8 +1,10 @@
-import json,nltk
+import json
+import nltk
 from tweets_processing import functions
 from keywords_helper import cancer_keywords as cancer
 
-staged_list={}
+staged_list = {}
+
 
 def analyze_file(fileName, tweet_count):
     """ Method to analyze file by file and calls all other methods """
@@ -17,17 +19,18 @@ def analyze_file(fileName, tweet_count):
                 tweet = tweet_data['full_text']
 
             if any(word.lower() in tweet for word in cancer.mylist or stemmer.stem(word) in tweet for word in cancer.mylist):
-                
+
                 tweet_count = tweet_count + 1
-                print(tweet_count)   
+                print(tweet_count)
                 json.dump(tweet_data, f)
                 f.write(' \n')
 
         except:
-            
+
             print("line not in json")
-        
+
     return int(tweet_count)
+
 
 if __name__ == "__main__":
 
@@ -36,5 +39,5 @@ if __name__ == "__main__":
     f = open("search_dir/head_neck_tweets_filter.json", "w+")
     tweet_count = 0
     fread = open("search_dir/head_neck_tweets.json", "r")
-    tweet_count=analyze_file(fread,tweet_count)
+    tweet_count = analyze_file(fread, tweet_count)
     f.close()

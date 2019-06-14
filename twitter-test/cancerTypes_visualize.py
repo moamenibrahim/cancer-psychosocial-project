@@ -19,7 +19,7 @@ for line in f.readlines():
     break
 
 staged_pos = sorted(staged_pos.items(),
-                        key=operator.itemgetter(1), reverse=True)
+                    key=operator.itemgetter(1), reverse=True)
 
 # Visualize Results
 x_axis = []

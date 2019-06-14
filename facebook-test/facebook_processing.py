@@ -1,5 +1,7 @@
-import os 
-import sys 
+from nameparser.parser import HumanName
+from ibmNLPunderstanding import AlchemyNLPunderstanding
+import os
+import sys
 import json
 import re
 import operator
@@ -9,7 +11,7 @@ import pyrebase
 import urllib
 import mimetypes
 import subprocess
-import nltk 
+import nltk
 import time
 import enchant
 import shlex
@@ -25,13 +27,10 @@ from nltk.tokenize import RegexpTokenizer
 from os.path import expanduser
 from nltk.tag import StanfordNERTagger
 sys.path.insert(0, '../IBM')
-from ibmNLPunderstanding import AlchemyNLPunderstanding
-from nameparser.parser import HumanName
 
 
-
-""" Configuration for the firbase database settings """ 
-config = { 
+""" Configuration for the firbase database settings """
+config = {
     "apiKey": "AIzaSyBIJYd5Xxa7DIORsLPJUCT2r4DqUa_bxlo",
     "authDomain": "analysis-820dc.firebaseapp.com",
     "databaseURL": "https://analysis-820dc.firebaseio.com",
@@ -39,26 +38,26 @@ config = {
     "storageBucket": "analysis-820dc.appspot.com",
     "messagingSenderId": "863565878024",
     "serviceAccount": "../../cancerDashboard/key.json"
-} 
+}
+
 
 class functions(object):
     def __init__(self):
-        
+
         self.translator = Translator()
         self.lda = lda_modeling()
         self.stop_words = set(stopwords.words('english'))
         self.NLP_understanding = AlchemyNLPunderstanding()
         # self.tagger = geniatagger.GeniaTagger(
         #     '../../cancer/geniatagger-3.0.2/geniatagger')
-        self.dictionary= enchant.Dict("en_US")
-        self.th=threading.Timer(60*50, self.reauthorize_firebase)
+        self.dictionary = enchant.Dict("en_US")
+        self.th = threading.Timer(60*50, self.reauthorize_firebase)
         self.th.start()
         self.reauthorize_firebase()
         time.sleep(7)
 
     def segmentation(self, tweet):
         return nltk.sent_tokenize(tweet)
-        
 
     def get_hashtags(self, tweet):
         """ Extracting Hashtags from tweets or text """
@@ -71,7 +70,6 @@ class functions(object):
                     words.append(word)
         return ' '.join(words)
 
-
     def get_link(self, tweet):
         """ Extracting links from tweets or text """
 
@@ -81,7 +79,6 @@ class functions(object):
             return match.group()
         return ''
 
-
     def strip_links(self, text):
         link_regex = re.compile(
             '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL)
@@ -89,7 +86,6 @@ class functions(object):
         for link in links:
             text = text.replace(link[0], ' ')
         return text, links
-
 
     def strip_all_entities(self, text):
         entity_prefixes = ['@', '#']
@@ -100,7 +96,6 @@ class functions(object):
                 if word[0] not in entity_prefixes:
                     words.append(word)
         return ' '.join(words)
-
 
     def get_pos(self, tweet):
         """ 
@@ -120,29 +115,27 @@ class functions(object):
         for row in result_postag:
             if (row[1] != ''):
                 if (row[1] in staged_rows):
-                    ## increment
+                    # increment
                     staged_rows[row[1]] += 1
                 else:
-                    ## add to list
+                    # add to list
                     staged_rows[row[1]] = 1
 
         staged_rows = sorted(staged_rows.items(),
-                            key=operator.itemgetter(1), reverse=True)
+                             key=operator.itemgetter(1), reverse=True)
         return staged_rows
-
 
     def get_stanford_pos(self, tweet):
         """
         part of speech tagging extraction
         """
-        path_to_model ='../../cancer/stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
-        path_to_jar ='../../cancer/stanford/stanford-postagger/stanford-postagger.jar'
+        path_to_model = '../../cancer/stanford/stanford-postagger/models/english-bidirectional-distsim.tagger'
+        path_to_jar = '../../cancer/stanford/stanford-postagger/stanford-postagger.jar'
         st = StanfordPOSTagger(path_to_model, path_to_jar=path_to_jar)
         result = st.tag(tweet.split())
         return result
 
-
-    def get_hyponyms(self,tweet):
+    def get_hyponyms(self, tweet):
         """ 
         hyponyms extraction and checking the topics list 
         """
@@ -150,7 +143,7 @@ class functions(object):
         words = tweet.split()
         for word in words:
             for i, syn in enumerate(wn.synsets(word)):
-                if(i>3):
+                if(i > 3):
                     pass
                 else:
                     entities["Hyponyms"] = []
@@ -170,14 +163,15 @@ class functions(object):
         result = st.tag(tweet.split())
         return result
 
-
     def remove_stopWords(self, tweet):
         """ Removing english stop words from the text sent 
         including punctuations """
         exclude = set(string.punctuation)
         word_tokens = word_tokenize(tweet)
-        filtered_sentence = [w for w in word_tokens if not w in self.stop_words]
-        punc_free = ' '.join(ch for ch in filtered_sentence if ch not in exclude)
+        filtered_sentence = [
+            w for w in word_tokens if not w in self.stop_words]
+        punc_free = ' '.join(
+            ch for ch in filtered_sentence if ch not in exclude)
         return filtered_sentence
 
     def call_train_lda(self, location):
@@ -202,17 +196,16 @@ class functions(object):
             print("Failed to get topic")
             return False
 
-
     def get_translate(self, input_str, lang):
         """ using googletrans to translate text from any language to English """
-        if(lang!='und'):
+        if(lang != 'und'):
             try:
-                translated=self.translator.translate(input_str, dest='en', src=lang)
+                translated = self.translator.translate(
+                    input_str, dest='en', src=lang)
                 return translated.text
             except:
                 # print("Failed to translate text")
                 return False
-
 
     # def get_Geniapos(self, tweet):
     #     """ Genia Tagger part of speech tagging extraction
@@ -220,11 +213,9 @@ class functions(object):
     #     out = self.tagger.parse(tweet)
     #     return out
 
-
     def get_sentiment(self, input_str):
         """ Get sentiment analysis when needed, the used API is IBM watson's """
         return self.NLP_understanding.get_response(input_str)
-
 
     def extract_link(self, text):
         """ Extracting links from tweets or text """
@@ -234,14 +225,12 @@ class functions(object):
             return match.group()
         return ''
 
-
     def guess_type_of(self, link, strict=True):
         """ Determine the link info and know whether it can be helpful for
         the study or no """
         # print(link[0][0])
         link_type, _ = mimetypes.guess_type(str(link[0][0]))
         return link_type
-
 
     def databasePush(self, tweet_count, tweet_data):
         """ A method to send tweets without processed data 
@@ -266,23 +255,25 @@ class functions(object):
         return
 
     ''' Finnish functions part '''
+
     def finnishParse(self, tweet, tweet_count):
         """ Parsing Finnish words and text, the library was developed by 
         univerity of Turku, it performs sentence splitting, tokenization, tagging, parsing """
-            
+
         wd = os.getcwd()
         os.chdir("../../cancer/Finnish-dep-parser")
         with open('finnParse.txt', 'w+') as f:
-                f.write(tweet)
-        subprocess.call('cat finnParse.txt | ./parser_wrapper.sh > output.conllu', shell=True)
-        subprocess.call('cat output.conllu | python split_clauses.py > output_clauses.conllu', shell=True)
+            f.write(tweet)
+        subprocess.call(
+            'cat finnParse.txt | ./parser_wrapper.sh > output.conllu', shell=True)
+        subprocess.call(
+            'cat output.conllu | python split_clauses.py > output_clauses.conllu', shell=True)
         subprocess.call(
             'cat output_clauses.conllu | python visualize_clauses.py > output_clauses'+str(tweet_count)+'.html', shell=True)
-        with open('output.conllu','r') as f:
+        with open('output.conllu', 'r') as f:
             parse_result = f.readline()
         os.chdir(wd)
         return parse_result
-
 
     def remove_finnstopWords(self, tweet):
         """ Removing Finnish stop words from the text sent 
@@ -295,12 +286,13 @@ class functions(object):
         texts = []
         raw = tweet.decode().lower()
         tokens = tokenizer.tokenize(raw)
-        stopped_tokens = [i for i in tokens if not i in stopwords and len(i) != 1]
+        stopped_tokens = [
+            i for i in tokens if not i in stopwords and len(i) != 1]
         texts.append(stopped_tokens)
         return stopped_tokens
 
-
     ''' Fetching information about users (tweeps) '''
+
     def analyze_location(self, fileName):
         """ Method to analyze file by file and calls all other methods """
         staged_location = {}
@@ -310,13 +302,12 @@ class functions(object):
             location = tweet_data['user']['location']
             if (location != ''):
                 if (location in staged_location):
-                    ## increment that location
+                    # increment that location
                     staged_location[location] += 1
                 else:
-                    ## add location to list
+                    # add location to list
                     staged_location[location] = 1
         return
-
 
     def analyze_user(self, fileName):
         """ Method to analyze file by file and calls all other methods """
@@ -327,36 +318,36 @@ class functions(object):
             user = tweet_data['user']['id']
             if (user != ''):
                 if (user in staged_users):
-                    ## increment that user
+                    # increment that user
                     staged_users[user] += 1
                 else:
-                    ## add user to list
+                    # add user to list
                     staged_users[user] = 1
         return
 
     def check_dictionary(self, tweet):
-        in_dict=0
-        not_in_dict=0
+        in_dict = 0
+        not_in_dict = 0
         text = word_tokenize(str(tweet))
         for word in text:
             result = self.dictionary.check(word)
             if result == True:
-                in_dict +=1
+                in_dict += 1
             else:
-                not_in_dict +=1 
+                not_in_dict += 1
         return in_dict/(in_dict+not_in_dict)
 
-    def get_human_names(self,text):
+    def get_human_names(self, text):
         tokens = nltk.tokenize.word_tokenize(text)
         pos = nltk.pos_tag(tokens)
-        sentt = nltk.ne_chunk(pos, binary = False)
+        sentt = nltk.ne_chunk(pos, binary=False)
         person_list = []
         person = []
         name = ""
         for subtree in sentt.subtrees(filter=lambda t: t.label() == 'PERSON'):
             for leaf in subtree.leaves():
                 person.append(leaf[0])
-            if len(person) > 1: #avoid grabbing lone surnames
+            if len(person) > 1:  # avoid grabbing lone surnames
                 for part in person:
                     name += part + ' '
                 if name[:-1] not in person_list:
@@ -365,11 +356,13 @@ class functions(object):
             person = []
         return (person_list)
 
-    def RateSentiment(self,sentiString):
-        #open a subprocess using shlex to get the command line string into the correct args list format
-        p = subprocess.Popen(shlex.split("java -jar ../../cancer/SentiStrength.jar stdin explain sentidata ../../cancer/SentiStrength_Data/"),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        #communicate via stdin the string to be rated. Note that all spaces are replaced with +
-        stdout_text, stderr_text = p.communicate(sentiString.replace(" ","+").encode("utf-8"))
-        #remove the tab spacing between the positive and negative ratings. e.g. 1    -5 -> 1-5
-        stdout_text = stdout_text.decode("utf-8").rstrip().replace("\t","")
-        return stdout_text[0],stdout_text[1:3]
+    def RateSentiment(self, sentiString):
+        # open a subprocess using shlex to get the command line string into the correct args list format
+        p = subprocess.Popen(shlex.split("java -jar ../../cancer/SentiStrength.jar stdin explain sentidata ../../cancer/SentiStrength_Data/"),
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # communicate via stdin the string to be rated. Note that all spaces are replaced with +
+        stdout_text, stderr_text = p.communicate(
+            sentiString.replace(" ", "+").encode("utf-8"))
+        # remove the tab spacing between the positive and negative ratings. e.g. 1    -5 -> 1-5
+        stdout_text = stdout_text.decode("utf-8").rstrip().replace("\t", "")
+        return stdout_text[0], stdout_text[1:3]

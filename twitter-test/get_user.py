@@ -3,7 +3,8 @@ from tweepy import API
 from tweepy import Cursor
 from datetime import datetime, date, time, timedelta
 from collections import Counter
-import sys,json
+import sys
+import json
 
 consumer_key = 'zgwY6GgJ2p6kCX39X17zm4UpK'
 consumer_secret = 'Kv9AazgJmYueIQPmY5kO1MhUsZvDiXaHJZw03fVe9p8H5AipPv'
@@ -17,25 +18,25 @@ auth_api = API(auth)
 
 def printRoutine(inputTxt):
     """ Method to print in a file and on screen for debugging purposes """
-    json.dump(inputTxt,f)
+    json.dump(inputTxt, f)
     f.write(' \n')
 
 
-account_list = [53292926, # Julie McCrossin
-                99625563, # Ann Silberman
-                12511062, # Barbara Jacoby
-                144851483, # Nancy's Point
-                16157175, # Nicole McLean
-                374864146, # Rann Patterson
-                65594160] # Dr. Gia Sison
+account_list = [53292926,  # Julie McCrossin
+                99625563,  # Ann Silberman
+                12511062,  # Barbara Jacoby
+                144851483,  # Nancy's Point
+                16157175,  # Nicole McLean
+                374864146,  # Rann Patterson
+                65594160]  # Dr. Gia Sison
 
 # threshold 7 tweets , max 30
-# account_list = [499649171, 499648091, 961153933, 3172336367, 2841368445, 738032030714318849, 497992988] 
+# account_list = [499649171, 499648091, 961153933, 3172336367, 2841368445, 738032030714318849, 497992988]
 # account_list = [19939596, 832662336917811201, 872881071771324416, 53292926]
 
 
 if len(account_list) > 0:
-    for index,target in enumerate(account_list):
+    for index, target in enumerate(account_list):
         print("Getting data for " + str(target))
         item = auth_api.get_user(target)
         print("name: " + item.name)
@@ -52,8 +53,7 @@ if len(account_list) > 0:
         print("Account age (in days): " + str(account_age_days))
         if account_age_days > 0:
             print("Average tweets per day: " + "%.2f" %
-                (float(tweets)/float(account_age_days)))
-
+                  (float(tweets)/float(account_age_days)))
 
         f = open("twitter-test/get_user_"+str(index+1)+".json", "w+")
 
@@ -78,7 +78,8 @@ if len(account_list) > 0:
                                 name = ent["screen_name"]
                             if name is not None:
                                 mentions.append(name)
-                printRoutine({"created at" : status.created_at.__str__(), "text" : status._json['text'], "entities" : status.entities })
+                printRoutine({"created at": status.created_at.__str__(
+                ), "text": status._json['text'], "entities": status.entities})
 
         print("Most mentioned Twitter users:")
         for item, count in Counter(mentions).most_common(10):
@@ -88,7 +89,7 @@ if len(account_list) > 0:
         for item, count in Counter(hashtags).most_common(10):
             print(item + "\t" + str(count))
 
-        print ("All done. Processed " + str(tweet_count) + " tweets.")
-        print ("--------------------------")
+        print("All done. Processed " + str(tweet_count) + " tweets.")
+        print("--------------------------")
 
 f.close()

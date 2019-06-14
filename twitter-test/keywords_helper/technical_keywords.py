@@ -1,4 +1,4 @@
-technical_list=[
+technical_list = [
     "XRCC1",
     "EGFR",
     "KRas",
@@ -7,8 +7,8 @@ technical_list=[
     "LCIS",
     "carcinoma in situ",
     "sarcoma",
-    "metastasis", 
-    "oncology", 
+    "metastasis",
+    "oncology",
     "TNM-luokitus",
     "TNM",
     "BRCA1",

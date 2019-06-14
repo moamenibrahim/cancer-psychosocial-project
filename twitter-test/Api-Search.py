@@ -16,7 +16,7 @@ print(searchQuery)
 fName = 'lung_tweets.json'  # We'll store the tweets in a text file.
 
 # If results only below a specific ID are, set max_id to that ID.
-# else default to no upper limit, 
+# else default to no upper limit,
 # start from the most recent tweet matching the search query.
 
 max_id = -1
@@ -43,7 +43,7 @@ with open(fName, 'w') as f:
             if (max_id <= 0):
                 if (not sinceId):
                     new_tweets = api.search(
-                        q=searchQuery, count=tweetsPerQry, 
+                        q=searchQuery, count=tweetsPerQry,
                         tweet_mode="extended", place="07d9cd6afd884001")
                 else:
                     new_tweets = api.search(q=searchQuery, count=tweetsPerQry,
@@ -63,14 +63,14 @@ with open(fName, 'w') as f:
             # str_lst=["Finland","Sweden","Suomi"]
             for tweet in new_tweets:
                 if tweet._json['user']['location'] != "":
-                # if  any(tweet._json['user']['location'] in s for s in str_lst) :
-                # if ('Finland' in (tweet._json['user']['location'])):
+                    # if  any(tweet._json['user']['location'] in s for s in str_lst) :
+                    # if ('Finland' in (tweet._json['user']['location'])):
                     f.write(jsonpickle.encode(
                         tweet._json, unpicklable=False)+'\n')
-                
+
                     downloaded_tweets = downloaded_tweets+1
                     print(tweet._json['full_text'])
-                    
+
                     tweetCount += len(new_tweets)
                     print("searched {0} tweets".format(tweetCount))
                     max_id = new_tweets[-1].id

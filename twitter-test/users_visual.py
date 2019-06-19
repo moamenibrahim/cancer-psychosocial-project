@@ -13,7 +13,7 @@ from nltk.stem.porter import PorterStemmer
 porter = PorterStemmer()
 
 plotly.tools.set_credentials_file(
-    username='moamenibrahim', api_key='mV0gCyPj5sIKGQqC78zC')
+    username='moamenibrahim', api_key='')
 
 staged_pos = []
 staged_hyponyms = []

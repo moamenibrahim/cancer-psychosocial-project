@@ -32,13 +32,6 @@ sys.path.insert(0, '../IBM')
 
 """ Configuration for the firbase database settings """
 config = {
-    "apiKey": "AIzaSyBIJYd5Xxa7DIORsLPJUCT2r4DqUa_bxlo",
-    "authDomain": "analysis-820dc.firebaseapp.com",
-    "databaseURL": "https://analysis-820dc.firebaseio.com",
-    "projectId": "analysis-820dc",
-    "storageBucket": "analysis-820dc.appspot.com",
-    "messagingSenderId": "863565878024",
-    "serviceAccount": "../../cancerDashboard/key.json"
 }
 
 

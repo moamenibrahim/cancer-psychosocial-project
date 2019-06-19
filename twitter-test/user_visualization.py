@@ -13,7 +13,7 @@ from nltk.stem.porter import PorterStemmer
 porter = PorterStemmer()
 
 plotly.tools.set_credentials_file(
-    username='moamenaibrahim', api_key='pk39TGSH9wl3WEUjWRCL')
+    username='moamenaibrahim', api_key='')
 
 f = open("twitter-test/user_results.json", "r")
 

@@ -38,7 +38,7 @@ matplotlib==2.2.3
 mccabe==0.6.1
 nameparser==0.5.7
 nbformat==4.4.0
-nltk==3.3
+nltk==3.4.5
 numpy==1.15.0
 oauth2client==3.0.0
 oauthlib==2.1.0

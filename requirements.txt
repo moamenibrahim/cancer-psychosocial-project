@@ -1,7 +1,7 @@
 asn1crypto==0.24.0
 astroid==2.2.5
 attrs==18.1.0
-autobahn==18.7.1
+autobahn==20.12.3
 Automat==0.7.0
 backcall==0.1.0
 boto==2.49.0

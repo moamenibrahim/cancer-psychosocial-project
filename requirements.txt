@@ -39,7 +39,7 @@ mccabe==0.6.1
 nameparser==0.5.7
 nbformat==4.4.0
 nltk==3.6.6
-numpy==1.21.0
+numpy==1.22.0
 oauth2client==3.0.0
 oauthlib==2.1.0
 pandas==0.23.4

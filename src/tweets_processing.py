@@ -1,5 +1,5 @@
 from nameparser.parser import HumanName
-from ibmNLPunderstanding import AlchemyNLPunderstanding
+from ..ibmNLP import AlchemyNLPunderstanding
 import os
 import sys
 import json
@@ -16,7 +16,6 @@ import time
 import enchant
 import shlex
 import threading
-from nltk.stem.wordnet import WordNetLemmatizer
 from gensim import corpora, models, similarities
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -24,39 +23,32 @@ from lda_topic import lda_modeling
 from googletrans import Translator
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import RegexpTokenizer
-from os.path import expanduser
 from nltk.tag import StanfordNERTagger
-sys.path.insert(0, '../IBM')
+from nltk.tag import StanfordPOSTagger
 
 
 """ Configuration for the firbase database settings """
 config = {
-    "apiKey": "AIzaSyBIJYd5Xxa7DIORsLPJUCT2r4DqUa_bxlo",
-    "authDomain": "analysis-820dc.firebaseapp.com",
-    "databaseURL": "https://analysis-820dc.firebaseio.com",
-    "projectId": "analysis-820dc",
-    "storageBucket": "analysis-820dc.appspot.com",
-    "messagingSenderId": "863565878024",
-    "serviceAccount": "../../cancerDashboard/key.json"
 }
 
 
 class functions(object):
     def __init__(self):
-
         self.translator = Translator()
         self.lda = lda_modeling()
         self.stop_words = set(stopwords.words('english'))
         self.NLP_understanding = AlchemyNLPunderstanding()
+        # Disabled Gennia tagger (Optional to include)
         # self.tagger = geniatagger.GeniaTagger(
         #     '../../cancer/geniatagger-3.0.2/geniatagger')
         self.dictionary = enchant.Dict("en_US")
-        self.th = threading.Timer(60*50, self.reauthorize_firebase)
-        self.th.start()
         self.reauthorize_firebase()
-        time.sleep(7)
+        self.th = threading.Timer(60*30, self.reauthorize_firebase)
+        self.th.start()
+        time.sleep(3)
 
     def segmentation(self, tweet):
+        """Dividing tweets to sentences for analysis"""
         return nltk.sent_tokenize(tweet)
 
     def get_hashtags(self, tweet):
@@ -72,7 +64,6 @@ class functions(object):
 
     def get_link(self, tweet):
         """ Extracting links from tweets or text """
-
         regex = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
         match = re.search(regex, tweet)
         if match:
@@ -80,6 +71,7 @@ class functions(object):
         return ''
 
     def strip_links(self, text):
+        """Extracts links from tweets and returns it"""
         link_regex = re.compile(
             '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)', re.DOTALL)
         links = re.findall(link_regex, text)
@@ -88,6 +80,7 @@ class functions(object):
         return text, links
 
     def strip_all_entities(self, text):
+        """Extracts mentions and hashtags from tweets and returns it"""
         entity_prefixes = ['@', '#']
         words = []
         for word in text.split():
@@ -96,6 +89,16 @@ class functions(object):
                 if word[0] not in entity_prefixes:
                     words.append(word)
         return ' '.join(words)
+
+    def remove_emojis(self, text):
+        emoji_pattern = re.compile("["
+                                   u"\U0001F600-\U0001F64F"  # emoticons
+                                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                                   u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                                   u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                                   "]+", flags=re.UNICODE)
+
+        return emoji_pattern.sub(r'', text)  # no emoji
 
     def get_pos(self, tweet):
         """ 
@@ -165,7 +168,8 @@ class functions(object):
 
     def remove_stopWords(self, tweet):
         """ Removing english stop words from the text sent 
-        including punctuations """
+        including punctuations 
+        """
         exclude = set(string.punctuation)
         word_tokens = word_tokenize(tweet)
         filtered_sentence = [
@@ -174,12 +178,12 @@ class functions(object):
             ch for ch in filtered_sentence if ch not in exclude)
         return filtered_sentence
 
-    def call_train_lda(self, location):
+    def call_train_lda(self):
         """
         Train Topic extraction from text using LDA (Latent Dirichet Allocation): 
         """
         try:
-            self.lda.train_lda(location)
+            self.lda.train_lda()
         except:
             print("Failed to train topic classifier")
 
@@ -246,13 +250,17 @@ class functions(object):
         self.firebase = pyrebase.initialize_app(config)
         self.auth = self.firebase.auth()
         self.db = self.firebase.database()
+        self.th = threading.Timer(60*30, self.reauthorize_firebase)
+        self.th.start()
         return
 
     def stop_firebase(self):
         """Cancelling the thread responsible for 
         re-authorize access to firebase"""
         self.th.cancel()
-        return
+        if(self.th.is_alive):
+            self.th.cancel()
+        return True
 
     ''' Finnish functions part '''
 
@@ -326,6 +334,8 @@ class functions(object):
         return
 
     def check_dictionary(self, tweet):
+        """Making sure that the translated text is in dictionary 
+        to verify the translation of tweets"""
         in_dict = 0
         not_in_dict = 0
         text = word_tokenize(str(tweet))
@@ -338,6 +348,7 @@ class functions(object):
         return in_dict/(in_dict+not_in_dict)
 
     def get_human_names(self, text):
+        """Catching human names from tweets"""
         tokens = nltk.tokenize.word_tokenize(text)
         pos = nltk.pos_tag(tokens)
         sentt = nltk.ne_chunk(pos, binary=False)
@@ -357,6 +368,7 @@ class functions(object):
         return (person_list)
 
     def RateSentiment(self, sentiString):
+        """Senti Strength java software to get sentiment from tweets"""
         # open a subprocess using shlex to get the command line string into the correct args list format
         p = subprocess.Popen(shlex.split("java -jar ../../cancer/SentiStrength.jar stdin explain sentidata ../../cancer/SentiStrength_Data/"),
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

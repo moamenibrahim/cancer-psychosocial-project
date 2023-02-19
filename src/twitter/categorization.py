@@ -15,7 +15,6 @@ stemmer = nltk.stem.PorterStemmer()
 plotly.tools.set_credentials_file(
     username='moamenaibrahim', api_key='pk39TGSH9wl3WEUjWRCL')
 
-# f = open("stream_results.json", "r")
 f = open("twitter-test/stream/stream_results.json", "r")
 
 staged_list = {}

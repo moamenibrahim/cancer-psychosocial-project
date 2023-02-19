@@ -19,11 +19,9 @@ outputDir = "outputDir"
 
 
 class CustomStreamListener(tweepy.StreamListener):
-
-    '''
+    """
     create the stream listener and get status, error and timeout issues
-    '''
-
+    """
     def __init__(self):
         super(CustomStreamListener, self).__init__(self)
         self.basePath = outputDir
@@ -97,7 +95,6 @@ class CustomStreamListener(tweepy.StreamListener):
         try:
             self.fh.close()
             print("files closed")
-
         except:
             pass
 

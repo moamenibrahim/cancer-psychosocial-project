@@ -21,8 +21,6 @@ data = {"threads": 0,
         "wordpairs": 0}
 
 # check if one of the keywords exist in the given string
-
-
 def search_keywords(string, keywords):
     for word in keywords:
         if word in string:
@@ -30,8 +28,6 @@ def search_keywords(string, keywords):
     return False
 
 # helper function to add word into the dictionary
-
-
 def addword(word, dist):
     if dist > 25:
         return
@@ -59,16 +55,11 @@ def addDistance(dist):
     return a
 
 # writing out to log-file the current contents of wordcount
-
-
 def writeToFile():
     try:
         remove("logs.txt")
     except OSError:
         pass
-    # print(wordcount)
-    #sorted_wc = sorted(wordcount.items(),key=operator.itemgetter(1),reverse=True)
-    # pprint(wordcount)
 
     with open("logs.txt", "a") as f:
         f.write("Threads: %s,Comments: %s\n" %
@@ -85,8 +76,6 @@ def writeToFile():
                 break
             i += 1
         f.close()
-
-# def
 
 
 # Load keywords and stopwords, and define characters to be removed
@@ -107,34 +96,13 @@ stopwords_file.close()
 files = listdir("../scraper-test/textdumps")
 punc = set(string.punctuation)
 
-# simple checking if the string contains wrong messages
 
 # Check if the thread is in the correct topics
-
-
 def checkTopic(topics, righttopics):
     for topic in topics:
         if topic["title"] in righttopics:
             return False
     return True
-# Handling final checks of the sentences before actual words are added
-
-
-def addSentence(w):
-    #wordlist=[word for word in w.split()]
-    # print w
-    l = [word for word in w.split(u'\t')]
-    print l
-    """
-        for i in range(len(wordlist)):
-        for j in range(i+1,len(wordlist)):
-            #print("test1")
-            #print(wordlist[i],wordlist[j])
-            if len(wordlist[i]) >= 2 and len(wordlist[j]) >= 2 and wordlist[i]!=wordlist[j] and wordlist[i] != " " and wordlist[j] != " ":
-                #print("test2")
-                addword((wordlist[i],wordlist[j]),j-i)
-"""
-
 
 # Helper function to remove odd characters from single words
 def checkWord(wrd):
@@ -166,7 +134,6 @@ def checkSentence(string):
 
 
 def convertToConllu(sent):
-    #sent = sent,"utf-8".rstrip()
     tokens = sent.split()
     newSent = ""
     for tIdx, t in enumerate(tokens):
@@ -221,5 +188,3 @@ for fileN in files:
             print("IncompleteJSONError")
             continue
         writeToFile()
-
-# pprint(data)

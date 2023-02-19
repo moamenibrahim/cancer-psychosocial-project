@@ -126,7 +126,6 @@ def analyze_file(fileName, tweet_count):
 
 
 if __name__ == "__main__":
-
     processing = functions()
     stemmer = nltk.stem.PorterStemmer()
     f = open("cancerStage_results.json", "w+")

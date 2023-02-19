@@ -10,7 +10,7 @@ from nltk.corpus import stopwords
 
 
 plotly.tools.set_credentials_file(
-    username='moamenaibrahim', api_key='')
+    username='', api_key='')
 
 f = open("twitter-test/stream/cancerType_results.json", "r")
 # Get and populate results

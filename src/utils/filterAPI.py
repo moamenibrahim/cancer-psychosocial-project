@@ -1,6 +1,5 @@
 import json
 import nltk
-from tweets_processing import functions
 from keywords_helper import cancer_keywords as cancer
 
 staged_list = {}
@@ -33,8 +32,6 @@ def analyze_file(fileName, tweet_count):
 
 
 if __name__ == "__main__":
-
-    # processing = functions()
     stemmer = nltk.stem.PorterStemmer()
     f = open("search_dir/head_neck_tweets_filter.json", "w+")
     tweet_count = 0

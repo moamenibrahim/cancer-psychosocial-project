@@ -85,10 +85,7 @@ def analyze_file(fileName, tweet_count):
                         'pure_text': pure_text}
 
             processing.databasePush(tweet_count, data)
-            json.dump(data, f, ensure_ascii=True)
-            # f.write(u"%s"%str(data))
-            # print(data)
-            f.write(' \n')
+            print(json.dump(data, f, ensure_ascii=True))
 
     return int(tweet_count)
 
